@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="gd_subtitle">Твой свет — адным націскам.</string>
+    <string name="gd_login">Лагін GDWorld</string>
+    <string name="gd_password">Пароль</string>
+    <string name="gd_totp">Код 2FA (калі ўключана)</string>
+    <string name="gd_sign_in">Увайсці</string>
+    <string name="gd_register">Стварыць акаўнт</string>
+    <string name="gd_reset">Скінуць пароль</string>
+    <string name="gd_pack">Зборка абнаўляецца аўтаматычна з сервера</string>
+    <string name="gd_play">Гуляць</string>
+    <string name="gd_cabinet">Кабінет на сайце</string>
+    <string name="gd_logout">Выйсці</string>
+    <string name="gd_cancel">Скасаваць</string>
+    <string name="gd_settings">Налады</string>
+    <string name="gd_advanced">Пашыраныя магчымасці</string>
+    <string name="gd_close">Закрыць</string>
+    <string name="gd_error">Не ўдалося завяршыць дзеянне. Правер злучэнне і даныя акаўнта ды паўтары.</string>
+    <string name="gd_install">Усталяванне Minecraft і NeoForge…</string>
+    <string name="gd_update">Абнаўленне зборкі…</string>
+    <string name="gd_launching">Запуск Minecraft…</string>
+    <string name="gd_code_required">Увядзі правільны код 2FA і паўтары ўваход.</string>
+    <string name="gd_settings_hint">Памяць падбіраецца аўтаматычна. Кіраванне, тэма і падрабязныя налады даступныя ў пашыраных магчымасцях.</string>
+    <string name="gd_ukrainian">Українська</string>
+    <string name="gd_belarusian">Беларуская</string>
+    <string name="gd_polish">Polski</string>
+</resources>

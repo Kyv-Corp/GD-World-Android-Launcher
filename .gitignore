@@ -1,0 +1,24 @@
+*.iml
+.gradle
+.idea
+.kotlin
+/local.properties
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+CLAUDE.md
+AGENTS.md
+.claudeignore
+.local/
+
+# GDWorld signing material stays outside source control.
+*.jks
+*.keystore
+local.properties
+
+server/build/
+
+dist/

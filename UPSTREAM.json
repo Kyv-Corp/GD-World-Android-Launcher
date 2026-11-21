@@ -1,0 +1,14 @@
+{
+  "repository": "https://github.com/Star1xr/ZalithLauncher2Plus",
+  "commit": "7d7578c5542f65751af4f50963fd74aaa6c5bf1c",
+  "license": "GPL-3.0",
+  "changes": "GDWorld branding, home screen, Gravit accounts and dynamic server pack, Android build registration",
+  "mobileglues": {
+    "version": "2.0.0",
+    "release": "https://github.com/MobileGL-Dev/MobileGlues-release/releases/tag/V2.0.0",
+    "apk_sha256": "a7e1eb29731fdece7ab3af7fb00692b856f1808a7544436e7b3eb6c08355581a",
+    "library_sha256": "3c87948b9b362ad2b6cf48e43ea181014f9999fe4607db0eff8b9db52d385fcd",
+    "source": "https://github.com/MobileGL-Dev/MobileGlues",
+    "license": "LGPL-2.1"
+  }
+}
