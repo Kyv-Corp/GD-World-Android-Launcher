@@ -2,6 +2,11 @@ package com.movtery.zalithlauncher.gdworld;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.function.LongConsumer;
 
 public final class PackFiles {
     private PackFiles() {}
@@ -18,6 +23,23 @@ public final class PackFiles {
         byte[] digest = java.util.Base64.getUrlDecoder().decode(encoded);
         if (digest.length != 20) throw new IllegalArgumentException("checksum");
         return digest;
+    }
+    public static void copyVerified(InputStream source, OutputStream output, long size, byte[] digest, LongConsumer progress) throws IOException {
+        if (size < 0 || digest.length != 20) throw new IllegalArgumentException("checksum");
+        MessageDigest sha;
+        try { sha = MessageDigest.getInstance("SHA-1"); }
+        catch (NoSuchAlgorithmException e) { throw new AssertionError(e); }
+        long total = 0;
+        byte[] buffer = new byte[65536];
+        progress.accept(0);
+        for (int count; (count = source.read(buffer)) != -1;) {
+            if (count > size - total) throw new IOException("checksum");
+            output.write(buffer, 0, count);
+            sha.update(buffer, 0, count);
+            total += count;
+            progress.accept(total);
+        }
+        if (total != size || !MessageDigest.isEqual(sha.digest(), digest)) throw new IOException("checksum");
     }
     public static void deleteTree(File root) throws IOException {
         if (!java.nio.file.Files.exists(root.toPath(), java.nio.file.LinkOption.NOFOLLOW_LINKS)) return;

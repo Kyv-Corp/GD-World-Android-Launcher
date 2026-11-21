@@ -22,7 +22,9 @@ import com.movtery.zalithlauncher.utils.network.ServerAddress
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
+import org.junit.Ignore
 
+@Ignore("Manual integration check: requires an external Minecraft server")
 class TestServers {
 
     @Test

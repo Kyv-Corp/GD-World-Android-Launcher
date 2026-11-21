@@ -41,31 +41,25 @@ import androidx.lifecycle.viewModelScope
 import com.movtery.zalithlauncher.BuildConfig
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.path.GLOBAL_CLIENT
-import com.movtery.zalithlauncher.path.GLOBAL_JSON
-import com.movtery.zalithlauncher.path.URL_ORIGINAL_PROJECT_INFO
-import com.movtery.zalithlauncher.path.URL_PROJECT_INFO
-import com.movtery.zalithlauncher.path.URL_PROJECT_RELEASES_LATEST
+import com.movtery.zalithlauncher.path.URL_PROJECT_RELEASES
 import com.movtery.zalithlauncher.setting.AllSettings
 import com.movtery.zalithlauncher.ui.components.MarqueeText
 import com.movtery.zalithlauncher.ui.components.SimpleListDialog
 import com.movtery.zalithlauncher.ui.screens.content.elements.DisabledAlpha
 import com.movtery.zalithlauncher.ui.upgrade.UpgradeDialog
 import com.movtery.zalithlauncher.ui.upgrade.UpgradeFilesDialog
-import com.movtery.zalithlauncher.upgrade.GithubContentApi
 import com.movtery.zalithlauncher.upgrade.GithubReleaseApi
 import com.movtery.zalithlauncher.upgrade.RemoteData
 import com.movtery.zalithlauncher.upgrade.TooFrequentOperationException
 import com.movtery.zalithlauncher.utils.logging.Logger
 import com.movtery.zalithlauncher.utils.network.safeBodyAsJson
 import com.movtery.zalithlauncher.utils.network.withRetry
-import com.movtery.zalithlauncher.utils.string.decodeBase64
 import io.ktor.client.request.get
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 private const val TAG = "LauncherUpgradeVM"
@@ -79,14 +73,6 @@ sealed interface LauncherUpgradeOperation {
     /** 打开网盘分享 */
     data class OpenCloudDrive(val cloudDrive: RemoteData.CloudDrive) : LauncherUpgradeOperation
 }
-
-/**
- * 最新版本的信息获取源
- */
-private const val LATEST_VERSION = "latest_version_md.json"
-private const val LATEST_API_URL = "$URL_PROJECT_INFO/$LATEST_VERSION"
-private const val LATEST_API_CHINESE_URL = LATEST_API_URL
-private const val LATEST_RELEASE_URL = URL_PROJECT_RELEASES_LATEST
 
 /**
  * 用于记录启动器更新 ViewModel
@@ -197,14 +183,15 @@ class LauncherUpgradeViewModel: ViewModel() {
         return withContext(Dispatchers.IO) {
             runCatching {
                 withRetry(logTag = "LauncherUpgrade_Release", maxRetries = 2) {
-                    val release = GLOBAL_CLIENT.get(LATEST_RELEASE_URL).safeBodyAsJson<GithubReleaseApi>()
-                    val code = release.tagName.filter { it.isDigit() }.take(6).toIntOrNull()
-                        ?: return@withRetry null
-                    val files = release.assets.map { asset ->
+                    val release = GithubReleaseApi.newestLauncherRelease(
+                        GLOBAL_CLIENT.get(URL_PROJECT_RELEASES).safeBodyAsJson<List<GithubReleaseApi>>()
+                    ) ?: error("No published GDWorld APK")
+                    val code = checkNotNull(release.versionCode)
+                    val files = release.assets.filter { it.name == "GDWorld-Android.apk" }.map { asset ->
                         RemoteData.RemoteFile(
                             fileName = asset.name,
                             uri = asset.browserDownloadUrl,
-                            arch = RemoteData.RemoteFile.Arch.ALL,
+                            arch = RemoteData.RemoteFile.Arch.ARM64,
                             size = asset.size
                         )
                     }
@@ -222,29 +209,9 @@ class LauncherUpgradeViewModel: ViewModel() {
                     )
                 }
             }.getOrElse { e ->
-                Logger.info(TAG, "Release API failed, trying content API: ${e.message}")
-                runCatching {
-                    withRetry(logTag = "LauncherUpgrade_Custom", maxRetries = 1) {
-                        val api = GLOBAL_CLIENT.get(LATEST_API_URL).safeBodyAsJson<GithubContentApi>()
-                        val contentString = decodeBase64(api.content)
-                        GLOBAL_JSON.decodeFromString(RemoteData.serializer(), contentString)
-                    }
-                }.getOrElse { e2 ->
-                    if (Locale.getDefault().language == "zh") {
-                        Logger.info(TAG, "Check for updates in the Chinese region.")
-                        runCatching {
-                            withRetry(logTag = "LauncherUpgrade_Chinese", maxRetries = 2) {
-                                GLOBAL_CLIENT.get(LATEST_API_CHINESE_URL).safeBodyAsJson<RemoteData>()
-                            }
-                        }.getOrElse { e3 ->
-                            Logger.warning(TAG, "Failed to check for launcher upgrade!", e3)
-                            null
-                        }
-                    } else {
-                        Logger.warning(TAG, "Failed to check for launcher upgrade!", e2)
-                        null
-                    }
-                }
+                if (e is kotlinx.coroutines.CancellationException) throw e
+                Logger.warning(TAG, "Failed to check for launcher upgrade!", e)
+                null
             }
         }
     }

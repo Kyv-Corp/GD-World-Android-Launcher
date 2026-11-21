@@ -155,6 +155,13 @@ androidComponents {
     }
 }
 
+// JVM tests need the same version tables that Android reads from the APK assets.
+tasks.withType<Test>().configureEach {
+    inputs.files(fileTree("src/main/assets/game"))
+    // AGP supplies the runtime classpath after task configuration.
+    doFirst { classpath += files("src/main") }
+}
+
 
 kotlin {
     compilerOptions {

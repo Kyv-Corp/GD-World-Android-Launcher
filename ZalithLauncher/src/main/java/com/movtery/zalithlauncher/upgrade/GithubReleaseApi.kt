@@ -24,8 +24,16 @@ data class GithubReleaseApi(
     @SerialName("published_at")
     val publishedAt: String,
     @SerialName("assets")
-    val assets: List<Asset>
+    val assets: List<Asset>,
+    val draft: Boolean = false
 ) {
+    val versionCode: Int? get() = tagName.takeIf { it.matches(Regex("v[0-9]{6}")) }?.drop(1)?.toIntOrNull()
+
+    companion object {
+        fun newestLauncherRelease(releases: List<GithubReleaseApi>): GithubReleaseApi? = releases
+            .filter { !it.draft && it.versionCode != null && it.assets.any { asset -> asset.name == "GDWorld-Android.apk" && asset.size > 0 } }
+            .maxByOrNull { it.versionCode!! }
+    }
     @Serializable
     data class Asset(
         @SerialName("name")

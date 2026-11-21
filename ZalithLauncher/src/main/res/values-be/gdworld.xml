@@ -24,4 +24,9 @@
     <string name="gd_ukrainian">Українська</string>
     <string name="gd_belarusian">Беларуская</string>
     <string name="gd_polish">Polski</string>
+    <string name="gd_connect">Падключэнне да GDWorld…</string>
+    <string name="gd_check">Праверка файлаў зборкі…</string>
+    <string name="gd_apply">Прымяненне правераных файлаў…</string>
+    <string name="gd_percent">%1$d%%</string>
+    <string name="gd_bytes">%1$s / %2$s</string>
 </resources>

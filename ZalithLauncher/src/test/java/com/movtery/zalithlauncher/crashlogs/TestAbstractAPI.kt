@@ -22,7 +22,9 @@ import com.movtery.zalithlauncher.crashlogs.platform.MCLogsAPI
 import com.movtery.zalithlauncher.crashlogs.platform.MirroredAPI
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
+import org.junit.Ignore
 
+@Ignore("Manual integration check: uploads data to external log services")
 class TestAbstractAPI {
     @Test
     fun testMirroredAPI() {

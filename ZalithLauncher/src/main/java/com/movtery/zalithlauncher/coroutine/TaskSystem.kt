@@ -99,7 +99,6 @@ object TaskSystem {
         scope.launch {
             task.onCancel()
         }
-        onTaskEnded(task)
     }
 
     /**

@@ -132,7 +132,10 @@ object LaunchGame {
 
                 if (version.getVersionName().startsWith("GDWorld-")) {
                     check(account.accountType == "GDWorld") { "GDWorld account required" }
-                    val (expected, _) = com.movtery.zalithlauncher.gdworld.GdPack.prepare(context) { }
+                    val (expected, _) = com.movtery.zalithlauncher.gdworld.GdPack.prepare(context) {
+                        task.updateProgress(it.fraction ?: -1f)
+                        task.updateMessage(androidText(context.getString(it.textRes) + if (it.detail.isEmpty()) "" else "\n${it.detail}"))
+                    }
                     check(expected == version.getVersionName()) { "Launch the current pack from the GDWorld home screen" }
                 }
                 runGame(context, version, account)

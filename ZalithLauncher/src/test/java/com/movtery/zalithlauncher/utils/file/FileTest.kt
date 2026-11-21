@@ -22,18 +22,23 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.jackhuang.hmcl.util.DigestUtils
 import org.junit.Test
+import org.junit.Assert.assertEquals
+import org.junit.Rule
+import org.junit.rules.TemporaryFolder
 import java.io.File
 
 class FileTest {
+    @get:Rule val temporary = TemporaryFolder()
 
     @Test
     fun testCalculateFileSha1() {
-        val file = File("F:\\Download\\geckolib-forge-1.21.8-5.2.2.jar")
+        val file = temporary.newFile("fixture.jar").apply { writeBytes(ByteArray(150000) { (it % 251).toByte() }) }
         runBlocking(Dispatchers.IO) {
             val sha11 = calculateFileSha1(file)
             println("sha1 1 = $sha11")
             val sha12 = DigestUtils.digestToString("SHA-1", file.toPath())
             println("sha1 2 = $sha12")
+            assertEquals(sha12, sha11)
         }
     }
 }
