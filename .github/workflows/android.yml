@@ -24,7 +24,7 @@ jobs:
       - name: Install Android tools
         run: sdkmanager 'platforms;android-37.0' 'build-tools;37.0.0' 'ndk;25.2.9519653'
       - name: Test and build ARM64 APK
-        run: bash gradlew :ZalithLauncher:testDebugUnitTest --tests "com.movtery.zalithlauncher.gdworld.*" :ZalithLauncher:assembleDebug -Darch=arm64 --stacktrace
+        run: bash gradlew :ZalithLauncher:testDebugUnitTest :ZalithLauncher:assembleDebug -Darch=arm64 --stacktrace
       - uses: actions/upload-artifact@v4
         with:
           name: GDWorld-Android-test
