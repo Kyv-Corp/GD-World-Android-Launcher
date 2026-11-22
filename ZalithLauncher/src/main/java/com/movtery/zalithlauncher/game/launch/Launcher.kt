@@ -216,6 +216,9 @@ abstract class Launcher(
         }
 
         userArguments += additionalArguments
+        if (userArguments.none { it.startsWith("-XX:ErrorFile=") }) {
+            userArguments += "-XX:ErrorFile=${File(PathManager.DIR_NATIVE_LOGS, "hs_err_pid%p.log").absolutePath}"
+        }
         return userArguments
     }
 
