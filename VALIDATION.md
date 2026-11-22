@@ -2,6 +2,12 @@
 
 Дата: 22 ноября 2026.
 
+## Исправление падения аккаунтов 0.1.5 в работе
+
+- Вход 0.1.4 на Poco подтверждён пользователем и записью сервера о подключении в 15:57:24.540 (время журнала сервера), без следующей ошибки ключа. ADB-снимки подтвердили полноширинный файловый менеджер, формат «65 B» и компактный диалог с Best_Jaro/Endayt.
+- Открытие аккаунтов вызвало FATAL EXCEPTION main: Asking for intrinsic measurements of SubcomposeLayout layouts is not supported. По точному R8 mapping 0.1.4 класс wg3 — FlowMeasurePolicy; вызов пришёл из новой FlowRow компоновки с lazy-панелью. Это регресс 0.1.4, не сбой OAuth.
+- В 0.1.5 FlowRow заменена обычными Row/Column: размеры preview и списка заданы при вызове панелей; родитель не запрашивает intrinsic-измерения LazyColumn. Исправление требует проверки открытия аккаунтов на устройстве. Ранее прошедший JVM/CI-набор этот runtime-дефект UI не обнаружил.
+
 ## Исправления 0.1.4 — вложенные разделы и авторизация
 
 - ADB-снимок подтвердил Invalid signature for profile public key; журнал сервера показал подпись длиной 1 байт вместо 384. Это соответствует AA== в [ProfileKeyFilter authlib-injector](https://github.com/yushijinhun/authlib-injector/blob/develop/src/main/java/moe/yushi/authlibinjector/httpd/ProfileKeyFilter.java). GDWorld-мост объявляет feature.enable_profile_key; POST /minecraftservices/player/certificates возвращает 204 для ожидаемого Bearer, 401 для чужого. Authlib 6.0.54 с телефона возвращает null для успешного пустого ответа (проверено по байткоду). Серверные online-mode/enforce-secure-profile не изменялись.
