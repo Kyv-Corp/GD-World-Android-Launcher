@@ -29,4 +29,6 @@
     <string name="gd_apply">Применение проверенных файлов…</string>
     <string name="gd_percent">%1$d%%</string>
     <string name="gd_bytes">%1$s / %2$s</string>
+    <string name="download_game_install_processor">Установка %1$s — шаг %2$d/%3$d, Java %4$d</string>
+    <string name="gd_install_error">Установка не завершилась. Повтори попытку; журнал установщика latest_process.log доступен в расширенных возможностях.</string>
 </resources>

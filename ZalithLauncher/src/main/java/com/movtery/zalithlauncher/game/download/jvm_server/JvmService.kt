@@ -43,14 +43,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
-import java.net.DatagramPacket
-import java.net.DatagramSocket
-import java.net.InetSocketAddress
+import java.util.concurrent.atomic.AtomicBoolean
 
 private const val TAG = "JvmService"
 
 class JvmService : Service() {
     private val scope = CoroutineScope(Dispatchers.Default)
+    private val exitSent = AtomicBoolean(false)
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -85,12 +84,12 @@ class JvmService : Service() {
                 jreName = jreName,
                 userHome = userHome,
                 onExit = { code, _ ->
-                    Logger.info(TAG, "Process exit with code $code")
-                    //移除前台通知再停止服务，让系统知道这是正常关闭
-                    stopForeground(STOP_FOREGROUND_REMOVE)
-                    scope.launch(Dispatchers.IO) {
+                    if (exitSent.compareAndSet(false, true)) {
+                        // The native exit hook kills this process as soon as the callback returns.
                         sendCode(code)
+                        stopForeground(STOP_FOREGROUND_REMOVE)
                         stopSelf()
+                        android.os.Process.killProcess(android.os.Process.myPid())
                     }
                 }
             )
@@ -101,13 +100,7 @@ class JvmService : Service() {
 
     private fun sendCode(code: Int) {
         try {
-            DatagramSocket().use { socket ->
-                socket.connect(InetSocketAddress("127.0.0.1", PROCESS_SERVICE_PORT))
-                val data = (code.toString() + "").toByteArray()
-                val packet = DatagramPacket(data, data.size)
-                socket.send(packet)
-                Logger.info(TAG, "Send code $code to 127.0.0.1:$PROCESS_SERVICE_PORT")
-            }
+            JvmExitSignal.send(PROCESS_SERVICE_PORT, code)
         } catch (e: Exception) {
             Logger.error(TAG, "Failed to send exit code", e)
         }

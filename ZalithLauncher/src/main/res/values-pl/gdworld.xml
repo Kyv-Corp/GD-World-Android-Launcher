@@ -29,4 +29,6 @@
     <string name="gd_apply">Stosowanie zweryfikowanych plików…</string>
     <string name="gd_percent">%1$d%%</string>
     <string name="gd_bytes">%1$s / %2$s</string>
+    <string name="download_game_install_processor">Instalowanie %1$s — krok %2$d/%3$d, Java %4$d</string>
+    <string name="gd_install_error">Instalacja nie została ukończona. Spróbuj ponownie; dziennik instalatora latest_process.log jest dostępny w funkcjach zaawansowanych.</string>
 </resources>

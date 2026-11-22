@@ -29,4 +29,6 @@
     <string name="gd_apply">Applying verified files…</string>
     <string name="gd_percent">%1$d%%</string>
     <string name="gd_bytes">%1$s / %2$s</string>
+    <string name="download_game_install_processor">Installing %1$s — step %2$d/%3$d, Java %4$d</string>
+    <string name="gd_install_error">Installation did not finish. Retry; the installer log is latest_process.log in Advanced features.</string>
 </resources>

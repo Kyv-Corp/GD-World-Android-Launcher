@@ -13,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import android.content.res.Configuration
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.LocalFocusManager
@@ -30,6 +32,8 @@ import com.movtery.zalithlauncher.utils.file.formatFileSize
 import com.movtery.zalithlauncher.viewmodel.sendKeepScreen
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.game.account.Account
+import com.movtery.zalithlauncher.game.download.jvm_server.JvmCrashException
+import com.movtery.zalithlauncher.utils.logging.Logger
 import com.movtery.zalithlauncher.game.account.AccountsManager
 import com.movtery.zalithlauncher.game.version.installed.VersionsManager
 import com.movtery.zalithlauncher.setting.AllSettings
@@ -62,6 +66,7 @@ fun GdHome(events: EventViewModel, advanced: () -> Unit) {
     val signedIn = account?.accountType == "GDWorld"
     val gold = Color(0xffffd300)
     val genericError = stringResource(R.string.gd_error)
+    val installerError = stringResource(R.string.gd_install_error)
     val codeText = stringResource(R.string.gd_code_required)
     val launchingText = stringResource(R.string.gd_launching)
     fun run(block: suspend () -> Unit) {
@@ -72,10 +77,16 @@ fun GdHome(events: EventViewModel, advanced: () -> Unit) {
             status = ""
             progress = null
             try { block() }
+            catch (e: TimeoutCancellationException) { failed = true; status = installerError; Logger.warning("GDWorld", "Installer timed out", e) }
             catch (e: CancellationException) { throw e }
             catch (e: Exception) {
                 failed = true
-                status = if (e.message in listOf("auth.require2fa", "auth.wrong2fa")) codeText else genericError
+                status = when {
+                    e is JvmCrashException -> installerError
+                    e.message in listOf("auth.require2fa", "auth.wrong2fa") -> codeText
+                    else -> genericError
+                }
+                Logger.warning("GDWorld", "Operation failed", e)
             }
             finally { operation = null; progress = null }
         }
@@ -85,16 +96,36 @@ fun GdHome(events: EventViewModel, advanced: () -> Unit) {
             Image(painterResource(R.drawable.gd_background), null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
             BoxWithConstraints(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.72f)).safeDrawingPadding().imePadding()) {
                 val compact = maxWidth < 600.dp
-                Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(if (compact) 16.dp else 24.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                val landscape = !compact && LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+                val header: @Composable () -> Unit = {
                     Row(Modifier.widthIn(max = 480.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Image(painterResource(R.drawable.gd_logo), null, Modifier.size(if (compact) 48.dp else 64.dp), contentScale = ContentScale.Fit)
+                        Image(painterResource(R.drawable.gd_logo), null, Modifier.size(if (compact || landscape) 48.dp else 64.dp), contentScale = ContentScale.Fit)
                         Column(Modifier.weight(1f)) {
-                            Text("GDWorld", style = MaterialTheme.typography.headlineLarge, color = gold)
+                            Text("GDWorld", style = if (landscape) MaterialTheme.typography.headlineMedium else MaterialTheme.typography.headlineLarge, color = gold)
                             Text(stringResource(R.string.gd_subtitle), color = Color.White)
                         }
                     }
-                    Card(Modifier.widthIn(max = 480.dp).fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = Color(0xff272729), contentColor = Color.White)) {
-                        Column(Modifier.fillMaxWidth().padding(if (compact) 16.dp else 20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                }
+                val sessionControls: @Composable () -> Unit = {
+                    Text(account!!.username, style = MaterialTheme.typography.titleLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    if (!landscape) Text(stringResource(R.string.gd_pack))
+                    Button(modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp), enabled = !busy, colors = ButtonDefaults.buttonColors(containerColor = gold, contentColor = Color.Black), onClick = { run {
+                        val (name, address) = GdPack.prepare(context) { progress = it }
+                        val version = withTimeout(15000) { VersionsManager.versions.first { versions -> versions.any { it.getVersionName() == name } }.first { it.getVersionName() == name } }
+                        status = launchingText
+                        events.sendEvent(EventViewModel.Event.Launch.PlayServer(version, address))
+                    } }) { Text(stringResource(R.string.gd_play)) }
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        TextButton(enabled = !busy, onClick = { uri.openUri("https://gd-network.ddns.net/cabinet") }) { Text(stringResource(R.string.gd_cabinet)) }
+                        TextButton(enabled = !busy, onClick = { run {
+                            withContext(Dispatchers.IO) { GdSession.clear() }
+                            account?.let { AccountsManager.deleteAccount(it) }
+                        } }) { Text(stringResource(R.string.gd_logout)) }
+                    }
+                }
+                val accountCard: @Composable () -> Unit = {
+                    Card(Modifier.widthIn(max = if (landscape) 640.dp else 480.dp).fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = Color(0xff272729), contentColor = Color.White)) {
+                        Column(Modifier.fillMaxWidth().padding(if (compact || landscape) 16.dp else 20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             if (!signedIn) {
                                 OutlinedTextField(login, { login = it }, enabled = !busy, singleLine = true, keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next), label = { Text(stringResource(R.string.gd_login)) }, modifier = Modifier.fillMaxWidth())
                                 OutlinedTextField(password, { password = it }, enabled = !busy, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next), visualTransformation = PasswordVisualTransformation(), label = { Text(stringResource(R.string.gd_password)) }, modifier = Modifier.fillMaxWidth())
@@ -111,23 +142,10 @@ fun GdHome(events: EventViewModel, advanced: () -> Unit) {
                                     TextButton(onClick = { uri.openUri("https://gd-network.ddns.net/auth/register") }) { Text(stringResource(R.string.gd_register)) }
                                     TextButton(onClick = { uri.openUri("https://gd-network.ddns.net/auth/reset") }) { Text(stringResource(R.string.gd_reset)) }
                                 }
-                            } else {
-                                Text(account!!.username, style = MaterialTheme.typography.titleLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                                Text(stringResource(R.string.gd_pack))
-                                Button(modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp), enabled = !busy, colors = ButtonDefaults.buttonColors(containerColor = gold, contentColor = Color.Black), onClick = { run {
-                                    val (name, address) = GdPack.prepare(context) { progress = it }
-                                    val version = withTimeout(15000) { VersionsManager.versions.first { versions -> versions.any { it.getVersionName() == name } }.first { it.getVersionName() == name } }
-                                    status = launchingText
-                                    events.sendEvent(EventViewModel.Event.Launch.PlayServer(version, address))
-                                } }) { Text(stringResource(R.string.gd_play)) }
-                                FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                                    TextButton(enabled = !busy, onClick = { uri.openUri("https://gd-network.ddns.net/cabinet") }) { Text(stringResource(R.string.gd_cabinet)) }
-                                    TextButton(enabled = !busy, onClick = { run {
-                                        withContext(Dispatchers.IO) { GdSession.clear() }
-                                        account?.let { AccountsManager.deleteAccount(it) }
-                                    } }) { Text(stringResource(R.string.gd_logout)) }
-                                }
+                            } else if (!landscape) {
+                                sessionControls()
                             }
+                            if (landscape && signedIn) Text(stringResource(R.string.gd_pack))
                             if (operation != null) {
                                 val current = progress
                                 if (current != null) {
@@ -152,9 +170,29 @@ fun GdHome(events: EventViewModel, advanced: () -> Unit) {
                             if (operation != null) TextButton(onClick = { operation?.cancel() }) { Text(stringResource(R.string.gd_cancel)) }
                         }
                     }
+                }
+                val footer: @Composable () -> Unit = {
                     FlowRow(Modifier.widthIn(max = 480.dp).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedButton(enabled = !busy, onClick = { settings = true }) { Text(stringResource(R.string.gd_settings)) }
                         TextButton(enabled = !busy, onClick = advanced) { Text(stringResource(R.string.gd_advanced)) }
+                    }
+                }
+                if (landscape) {
+                    Row(Modifier.widthIn(max = 1100.dp).fillMaxSize().align(Alignment.TopCenter).padding(16.dp), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+                        Column(Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+                            header()
+                            if (signedIn) sessionControls()
+                            footer()
+                        }
+                        Column(Modifier.weight(1.8f).fillMaxHeight().verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally) {
+                            accountCard()
+                        }
+                    }
+                } else {
+                    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(if (compact) 16.dp else 24.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        header()
+                        accountCard()
+                        footer()
                     }
                 }
             }

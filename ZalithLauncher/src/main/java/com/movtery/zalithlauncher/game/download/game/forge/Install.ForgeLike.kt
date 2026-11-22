@@ -22,7 +22,6 @@ import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.components.jre.Jre
-import com.movtery.zalithlauncher.context.GlobalContext
 import com.movtery.zalithlauncher.coroutine.Task
 import com.movtery.zalithlauncher.game.download.game.GameLibDownloader
 import com.movtery.zalithlauncher.game.download.game.getLibraryPath
@@ -30,7 +29,6 @@ import com.movtery.zalithlauncher.game.download.game.models.ForgeLikeInstallProc
 import com.movtery.zalithlauncher.game.download.game.models.toPath
 import com.movtery.zalithlauncher.game.download.game.parseLibraryComponents
 import com.movtery.zalithlauncher.game.download.jvm_server.runJvmRetryRuntimes
-import com.movtery.zalithlauncher.game.download.jvm_server.stopAllNonMainProcesses
 import com.movtery.zalithlauncher.game.version.download.BaseMinecraftDownloader
 import com.movtery.zalithlauncher.notification.NoticeProgress
 import com.movtery.zalithlauncher.ui.androidText
@@ -84,6 +82,7 @@ fun getForgeLikeInstallTask(
                 //以 HMCL 的方式手动安装
                 installNewForgeHMCLWay(
                     task = task,
+                    jre = installerJavaRuntime(File(tempMinecraftDir, "versions/$inherit/$inherit.json").readText()),
                     loaderName = loaderName,
                     tempInstaller = tempInstaller,
                     tempGameFolder = tempGameFolder,
@@ -114,6 +113,7 @@ fun getForgeLikeInstallTask(
  */
 private suspend fun installNewForgeHMCLWay(
     task: Task,
+    jre: Jre,
     loaderName: String,
     tempInstaller: File,
     tempGameFolder: File,
@@ -183,6 +183,7 @@ private suspend fun installNewForgeHMCLWay(
 
     runProcessors(
         task = task,
+        jre = jre,
         loaderName = loaderName,
         tempMinecraftDir = tempMinecraftDir,
         tempGameDir = tempGameFolder,
@@ -280,6 +281,7 @@ private suspend fun installOldForge(
  */
 private suspend fun runProcessors(
     task: Task,
+    jre: Jre,
     loaderName: String,
     tempMinecraftDir: File,
     tempGameDir: File,
@@ -349,27 +351,26 @@ private suspend fun runProcessors(
         Triple(processor, jvmArgs, outputs.map { (key, value) -> Paths.get(key) to value })
     }
 
-    stopAllNonMainProcesses(GlobalContext)
     //正式开始执行命令
     commandList.forEachIndexed { index, (processor, jvmArgs, outputs) ->
         val step = index + 1
-        val progress = step.toFloat() / commandList.size
         val taskStr = outputs.joinToString(", ") { (artifact, _) -> artifact.name }
+            .ifBlank { File(processor.getJar().toPath()).name }
 
         runJvmRetryRuntimes(
             logId = FORGE_LIKE_INSTALL_ID,
             jvmArgs = jvmArgs,
             prefixArgs = { null },
-            jre = Jre.JRE_8,
+            jre = jre,
             userHome = tempGameDir.absolutePath.trimEnd('\\'),
             postSummary = "$loaderName $taskStr ($step/${commandList.size})",
-            postProgress = NoticeProgress(commandList.size, step)
-        ) {
+            postProgress = NoticeProgress(commandList.size, index, indeterminate = true)
+        ) { runtime ->
             val jarPath = processor.getJar().toPath()
 
-            task.updateProgress(progress)
+            task.updateProgress(-1f)
             task.updateMessage(androidText(
-                R.string.download_game_install_base_installing, taskStr
+                R.string.download_game_install_processor, taskStr, step, commandList.size, runtime.majorVersion
             ))
 
             Logger.info(TAG, "Start to run $jarPath with args: $jvmArgs")
@@ -386,6 +387,7 @@ private suspend fun runProcessors(
                 throw IOException("Checksum mismatch: expected $value, got $code for $artifact")
             }
         }
+        task.updateProgress(step.toFloat() / commandList.size)
     }
 }
 
@@ -429,4 +431,11 @@ private suspend fun progressIgnoreList(
     tempVersionJson.writeText(
         GSON.toJson(jsonObject)
     )
+}
+
+fun installerJavaRuntime(versionJson: String): Jre {
+    val major = versionJson.parseToJson().getAsJsonObject("javaVersion")?.get("majorVersion")?.asInt ?: 8
+    require(major > 0) { "Invalid installer Java version" }
+    return Jre.entries.firstOrNull { it.majorVersion >= major }
+        ?: error("Unsupported installer Java version: $major")
 }

@@ -19,7 +19,6 @@
 package com.movtery.zalithlauncher.game.download.game
 
 import android.content.Context
-import android.content.Intent
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.context.GlobalContext
 import com.movtery.zalithlauncher.coroutine.Task
@@ -49,8 +48,6 @@ import com.movtery.zalithlauncher.game.download.game.optifine.getOptiFineDownloa
 import com.movtery.zalithlauncher.game.download.game.optifine.getOptiFineInstallTask
 import com.movtery.zalithlauncher.game.download.game.optifine.getOptiFineModsDownloadTask
 import com.movtery.zalithlauncher.game.download.game.optifine.targetTempOptiFineInstaller
-import com.movtery.zalithlauncher.game.download.jvm_server.JVMSocketServer
-import com.movtery.zalithlauncher.game.download.jvm_server.JvmService
 import com.movtery.zalithlauncher.game.path.getGameHome
 import com.movtery.zalithlauncher.game.version.download.BaseMinecraftDownloader
 import com.movtery.zalithlauncher.game.version.download.MinecraftDownloader
@@ -704,13 +701,6 @@ class GameInstaller(
 
         if (info.overwrite) {
             revertClientDir()
-        }
-
-        CoroutineScope(Dispatchers.Main).launch {
-            //停止Jvm服务
-            val intent = Intent(GlobalContext.applicationContext, JvmService::class.java)
-            GlobalContext.applicationContext.stopService(intent)
-            JVMSocketServer.stop()
         }
     }
 

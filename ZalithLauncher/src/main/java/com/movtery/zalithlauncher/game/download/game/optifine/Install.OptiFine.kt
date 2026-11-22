@@ -20,13 +20,11 @@ package com.movtery.zalithlauncher.game.download.game.optifine
 
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.components.jre.Jre
-import com.movtery.zalithlauncher.context.GlobalContext
 import com.movtery.zalithlauncher.coroutine.Task
 import com.movtery.zalithlauncher.game.addons.modloader.ModLoader
 import com.movtery.zalithlauncher.game.addons.modloader.optifine.OptiFineVersion
 import com.movtery.zalithlauncher.game.download.game.isOldVersion
 import com.movtery.zalithlauncher.game.download.jvm_server.runJvmRetryRuntimes
-import com.movtery.zalithlauncher.game.download.jvm_server.stopAllNonMainProcesses
 import com.movtery.zalithlauncher.game.version.download.parseTo
 import com.movtery.zalithlauncher.game.versioninfo.models.GameManifest
 import com.movtery.zalithlauncher.path.LibPath
@@ -61,7 +59,6 @@ fun getOptiFineInstallTask(
             ))
 
             if (isNewVersion) {
-                stopAllNonMainProcesses(GlobalContext)
                 runJvmRetryRuntimes(
                     OPTIFINE_INSTALL_ID,
                     jvmArgs =

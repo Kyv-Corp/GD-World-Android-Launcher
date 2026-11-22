@@ -18,4 +18,8 @@
 
 package com.movtery.zalithlauncher.game.download.jvm_server
 
-class JvmCrashException(val code: Int) : RuntimeException("During installation, the JVM exited with exception code $code.")
+class JvmCrashException(
+    val code: Int,
+    detail: String = "During installation, the JVM exited with exception code $code.",
+    cause: Throwable? = null
+) : RuntimeException(detail, cause)

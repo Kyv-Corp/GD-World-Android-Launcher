@@ -55,30 +55,24 @@ fun startJvmService(
 }
 
 /**
- * 当前是否只有主进程正在运行
+ * Whether the dedicated installer process is still present.
  */
-fun isOnlyMainProcessesRunning(context: Context): Boolean {
+fun isJvmProcessRunning(context: Context): Boolean {
     val am = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-    val mainProcessName = context.packageName
-    val myPid = android.os.Process.myPid()
-
-    val appProcesses = am.runningAppProcesses.filter {
-        it.processName.startsWith(mainProcessName)
+    return am.runningAppProcesses.orEmpty().any {
+        it.processName == "${context.packageName}:jvm"
     }
-
-    return appProcesses.all { it.pid == myPid }
 }
 
 /**
- * 停止所有非主进程服务
+ * Stop only the installer; the running game belongs to a different process.
  */
-fun stopAllNonMainProcesses(context: Context) {
+fun stopJvmProcess(context: Context) {
+    context.stopService(Intent(context, JvmService::class.java))
     val am = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
     val mainPid = android.os.Process.myPid()
-    val mainProcessName = context.packageName
-
-    am.runningAppProcesses
-        .filter { it.processName.startsWith(mainProcessName) && it.pid != mainPid }
+    am.runningAppProcesses.orEmpty()
+        .filter { it.processName == "${context.packageName}:jvm" && it.pid != mainPid }
         .forEach {
             try {
                 android.os.Process.killProcess(it.pid)

@@ -22,13 +22,18 @@ import com.movtery.zalithlauncher.components.jre.Jre
 import com.movtery.zalithlauncher.context.GlobalContext
 import com.movtery.zalithlauncher.notification.NoticeProgress
 import com.movtery.zalithlauncher.utils.logging.Logger
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.withContext
-import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 private const val TAG = "GameJVMRunner"
+private val installerJvm = Mutex()
 
 /**
  * 运行一个简易的JVM环境，安装ModLoader，同时在jvm退出时，尝试使用其他的Java环境重试
@@ -43,14 +48,9 @@ suspend fun runJvmRetryRuntimes(
     userHome: String,
     postSummary: String? = null,
     postProgress: NoticeProgress? = null,
-    start: () -> Unit = {}
+    start: (Jre) -> Unit = {}
 ): Unit = withContext(Dispatchers.Default) {
-    while (!isOnlyMainProcessesRunning(context = GlobalContext)) {
-        Logger.info(TAG, "$logId Waiting for other processes stop...")
-        delay(100L.milliseconds)
-    }
-
-    start()
+    start(jre)
 
     val finalArgs = prefixArgs(jre)?.let {
         "$it $jvmArgs"
@@ -68,6 +68,7 @@ suspend fun runJvmRetryRuntimes(
         val nextJava: Jre? = when (jre) {
             Jre.JRE_8 -> Jre.JRE_17
             Jre.JRE_17 -> Jre.JRE_21
+            Jre.JRE_21 -> Jre.JRE_25
             else -> null
         }
 
@@ -92,28 +93,46 @@ suspend fun startJvmServiceAndWaitExit(
     userHome: String? = null,
     postSummary: String? = null,
     postProgress: NoticeProgress? = null,
-): Int = withContext(Dispatchers.IO) {
-    val doneSignal = CompletableDeferred<Unit>()
-
-    startJvmService(
-        context = GlobalContext,
-        jvmArgs = jvmArgs,
-        userHome = userHome,
-        jreName = jreName,
-        postSummary = postSummary,
-        postProgress = postProgress
-    )
-
-    JVMSocketServer.start { receiveMsg ->
-        Logger.info(TAG, "receive msg: $receiveMsg, stopping server...")
-        if (!doneSignal.isCompleted) {
-            doneSignal.complete(Unit)
+): Int = installerJvm.withLock {
+    try {
+        withContext(Dispatchers.IO) {
+            stopJvmProcess(GlobalContext)
+            withTimeout(10_000) {
+                while (isJvmProcessRunning(GlobalContext)) delay(100)
+            }
+            JvmExitSignal(PROCESS_SERVICE_PORT).use { signal ->
+                try {
+                    startJvmService(
+                        context = GlobalContext,
+                        jvmArgs = jvmArgs,
+                        userHome = userHome,
+                        jreName = jreName,
+                        postSummary = postSummary,
+                        postProgress = postProgress
+                    )
+                    val started = System.nanoTime()
+                    var seenProcess = false
+                    var code: Int? = null
+                    withTimeout(20 * 60_000L) {
+                        while (code == null) {
+                            currentCoroutineContext().ensureActive()
+                            code = signal.receive()
+                            if (code == null) {
+                                val alive = isJvmProcessRunning(GlobalContext)
+                                seenProcess = seenProcess || alive
+                                if (!alive && (seenProcess || System.nanoTime() - started > 30_000_000_000L)) {
+                                    code = -1
+                                }
+                            }
+                        }
+                    }
+                    checkNotNull(code).also { Logger.info(TAG, "Installer exit code: $it") }
+                } finally {
+                    stopJvmProcess(GlobalContext)
+                }
+            }
         }
-        JVMSocketServer.stop()
+    } catch (e: TimeoutCancellationException) {
+        throw JvmCrashException(-1, "Installer JVM timed out; see latest_process.log", e)
     }
-    doneSignal.await()
-
-    val code = JVMSocketServer.receiveMsg?.toIntOrNull()
-    Logger.info(TAG, "receive exit code: ${code ?: "unknown, default 0"}")
-    code ?: 0
 }
