@@ -33,5 +33,5 @@
     <string name="gd_install_error">Встановлення не завершилося. Повтори спробу; журнал встановлювача latest_process.log доступний у розширених можливостях.</string>
     <string name="gd_back_home">Повернутися до GDWorld</string>
     <string name="gd_auth_wait">Забагато спроб входу. Зачекай 10 секунд і повтори; перезапускати застосунок не потрібно.</string>
-    <string name="gd_about_upstream">GDWorld Android заснований на Zalith Launcher 2 від MovTery та ZalithLauncher2Plus від Star1xr. Інтеграція GDWorld: Kyv-Corp. Вихідний код: GPLv3.</string>
+    <string name="gd_about_upstream">GDWorld Android заснований на Zalith Launcher 2 від MovTery та ZalithLauncher2Plus від Star1xr. Інтеграція GDWorld: Best_Jaro, Endayt (Kyv-Corp). Вихідний код: GPLv3.</string>
 </resources>
