@@ -24,6 +24,9 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -52,6 +55,7 @@ import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.ui.window.Dialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -155,44 +159,8 @@ fun LauncherScreen(
             onDismissRequest = { performanceSettingsState = PerformanceSettingsOperation.None }
         )
 
-        Row(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            SideBar(
-                modifier = Modifier
-                    .padding(start = 12.dp, top = 12.dp, bottom = 12.dp),
-                isVisible = isVisible,
-                onFpsClick = {
-                    performanceSettingsState = PerformanceSettingsOperation.Fps
-                },
-                onVersionsClick = {
-                    backStackViewModel.mainScreen.removeAndNavigateTo(
-                        remove = NestedNavKey.VersionSettings::class,
-                        screenKey = NormalNavKey.VersionsManager
-                    )
-                },
-                onInfoClick = {
-                    showAboutDialog = true
-                }
-            )
-
-            CompositionLocalProvider(
-                LocalUriHandler provides object : UriHandler {
-                    override fun openUri(uri: String) {
-                        onOpenLink(uri)
-                    }
-                }
-            ) {
-                ContentMenu(
-                    modifier = Modifier.weight(7f),
-                    isVisible = isVisible,
-                    onHomePageEvent = onHomePageEvent,
-                    onNavigateToStats = onNavigateToStats,
-                    onNavigateToPlayTimeStats = onNavigateToPlayTimeStats,
-                    onNavigateToLog = onNavigateToLog
-                )
-            }
-
+        BoxWithConstraints(Modifier.fillMaxSize()) {
+            val compact = maxWidth < 600.dp
             val toAccountManageScreen: () -> Unit = {
                 backStackViewModel.mainScreen.navigateTo(
                     screenKey = NormalNavKey.AccountManager(FirstLoginMenu.NONE)
@@ -209,17 +177,103 @@ fun LauncherScreen(
                     navigateToVersions(version)
                 }
             }
-            RightMenu(
-                isVisible = isVisible,
-                modifier = Modifier
-                    .weight(3f)
-                    .fillMaxHeight()
-                    .padding(top = 12.dp, end = 12.dp, bottom = 12.dp),
-                onLaunchGame = onLaunchGame,
-                toAccountManageScreen = toAccountManageScreen,
-                toVersionManageScreen = toVersionManageScreen,
-                toVersionSettingsScreen = toVersionSettingsScreen,
-            )
+            if (compact) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    item {
+                        RightMenu(
+                            isVisible = isVisible,
+                            modifier = Modifier.fillMaxWidth().height(280.dp),
+                            onLaunchGame = onLaunchGame,
+                            toAccountManageScreen = toAccountManageScreen,
+                            toVersionManageScreen = toVersionManageScreen,
+                            toVersionSettingsScreen = toVersionSettingsScreen
+                        )
+                    }
+                    item {
+                        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            TextButton(onClick = { performanceSettingsState = PerformanceSettingsOperation.Fps }) {
+                                Text(stringResource(R.string.game_menu_option_fps_settings))
+                            }
+                            TextButton(onClick = toVersionManageScreen) {
+                                Text(stringResource(R.string.page_title_version_manage))
+                            }
+                            TextButton(onClick = { showAboutDialog = true }) {
+                                Text(stringResource(R.string.about_launcher_title))
+                            }
+                        }
+                    }
+                    item {
+                        CompositionLocalProvider(LocalUriHandler provides object : UriHandler {
+                            override fun openUri(uri: String) { onOpenLink(uri) }
+                        }) {
+                            ContentMenu(
+                                modifier = Modifier.fillMaxWidth(),
+                                compact = true,
+                                isVisible = isVisible,
+                                onHomePageEvent = onHomePageEvent,
+                                onNavigateToStats = onNavigateToStats,
+                                onNavigateToPlayTimeStats = onNavigateToPlayTimeStats,
+                                onNavigateToLog = onNavigateToLog
+                            )
+                        }
+                    }
+                }
+            } else {
+                Row(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    SideBar(
+                        modifier = Modifier
+                            .padding(start = 12.dp, top = 12.dp, bottom = 12.dp),
+                        isVisible = isVisible,
+                        onFpsClick = {
+                            performanceSettingsState = PerformanceSettingsOperation.Fps
+                        },
+                        onVersionsClick = {
+                            backStackViewModel.mainScreen.removeAndNavigateTo(
+                                remove = NestedNavKey.VersionSettings::class,
+                                screenKey = NormalNavKey.VersionsManager
+                            )
+                        },
+                        onInfoClick = {
+                            showAboutDialog = true
+                        }
+                    )
+
+                    CompositionLocalProvider(
+                        LocalUriHandler provides object : UriHandler {
+                            override fun openUri(uri: String) {
+                                onOpenLink(uri)
+                            }
+                        }
+                    ) {
+                        ContentMenu(
+                            modifier = Modifier.weight(7f),
+                            isVisible = isVisible,
+                            onHomePageEvent = onHomePageEvent,
+                            onNavigateToStats = onNavigateToStats,
+                            onNavigateToPlayTimeStats = onNavigateToPlayTimeStats,
+                            onNavigateToLog = onNavigateToLog
+                        )
+                    }
+
+                    RightMenu(
+                        isVisible = isVisible,
+                        modifier = Modifier
+                            .weight(3f)
+                            .fillMaxHeight()
+                            .padding(top = 12.dp, end = 12.dp, bottom = 12.dp),
+                        onLaunchGame = onLaunchGame,
+                        toAccountManageScreen = toAccountManageScreen,
+                        toVersionManageScreen = toVersionManageScreen,
+                        toVersionSettingsScreen = toVersionSettingsScreen,
+                    )
+                }
+            }
         }
     }
 }
@@ -227,6 +281,7 @@ fun LauncherScreen(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun ContentMenu(
+    compact: Boolean = false,
     isVisible: Boolean,
     onHomePageEvent: (MarkdownBlock.Button.Event) -> Unit,
     onNavigateToStats: () -> Unit,
@@ -245,9 +300,9 @@ private fun ContentMenu(
 
     Column(
         modifier = modifier
-            .fillMaxSize()
+            .then(if (compact) Modifier.fillMaxWidth() else Modifier.fillMaxSize())
             .offset { IntOffset(x = 0, y = yOffset.roundToPx()) }
-            .padding(all = 12.dp),
+            .padding(all = if (compact) 0.dp else 12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         if (BuildConfig.DEBUG) {
@@ -276,15 +331,16 @@ private fun ContentMenu(
             }
         }
 
-        // Stats grid fills remaining space — no scroll
+        // Wide layouts fill the panel; compact layouts scroll at the screen level.
         StatsGrid(
-            modifier = Modifier.weight(1f),
+            modifier = if (compact) Modifier else Modifier.weight(1f),
+            compact = compact,
             onNavigateToStats = onNavigateToStats,
             onNavigateToPlayTimeStats = onNavigateToPlayTimeStats,
             onNavigateToLog = onNavigateToLog
         )
 
-        // Home page content below (only shown when configured)
+        // Keep configured home content bounded inside the compact screen scroll.
         when (val state = pageState) {
             is HomePageState.Blank -> {}
             is HomePageState.Loading -> {
@@ -308,7 +364,7 @@ private fun ContentMenu(
             }
             is HomePageState.None -> {
                 LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().then(if (compact) Modifier.heightIn(max = 400.dp) else Modifier),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     customHomePage(
@@ -328,6 +384,7 @@ private const val CHANGELOGS_UPDATE_TR = "https://raw.githubusercontent.com/Star
 @Composable
 private fun StatsGrid(
     modifier: Modifier = Modifier,
+    compact: Boolean = false,
     onNavigateToStats: () -> Unit,
     onNavigateToPlayTimeStats: () -> Unit = {},
     onNavigateToLog: (String) -> Unit,
@@ -336,7 +393,7 @@ private fun StatsGrid(
     val versionNames = remember(versions) { versions.map { it.getVersionName() } }
 
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.then(if (compact) Modifier.fillMaxWidth() else Modifier.fillMaxSize()),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
@@ -346,35 +403,42 @@ private fun StatsGrid(
                 .padding(horizontal = 4.dp)
                 .alpha(0.5f)
         )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            WeeklyPlayTimeChart(
-                modifier = Modifier.weight(1f).fillMaxHeight(),
-                versionNames = versionNames
-            )
-            ChangelogCard(
-                modifier = Modifier.weight(1f).fillMaxHeight()
-            )
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            DailyPlayTimeCard(
-                modifier = Modifier.weight(1f).fillMaxHeight(),
-                versionNames = versionNames,
-                onClick = onNavigateToPlayTimeStats
-            )
-            LastLogCard(
-                modifier = Modifier.weight(1f).fillMaxHeight(),
-                onNavigateToLog = onNavigateToLog
-            )
+        if (compact) {
+            WeeklyPlayTimeChart(Modifier.fillMaxWidth().height(180.dp), versionNames)
+            DailyPlayTimeCard(Modifier.fillMaxWidth().height(160.dp), versionNames, onNavigateToPlayTimeStats)
+            LastLogCard(Modifier.fillMaxWidth().height(180.dp), onNavigateToLog)
+            ChangelogCard(Modifier.fillMaxWidth().height(240.dp))
+        } else {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                WeeklyPlayTimeChart(
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    versionNames = versionNames
+                )
+                ChangelogCard(
+                    modifier = Modifier.weight(1f).fillMaxHeight()
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                DailyPlayTimeCard(
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    versionNames = versionNames,
+                    onClick = onNavigateToPlayTimeStats
+                )
+                LastLogCard(
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    onNavigateToLog = onNavigateToLog
+                )
+            }
         }
     }
 }

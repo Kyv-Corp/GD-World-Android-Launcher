@@ -31,4 +31,5 @@
     <string name="gd_bytes">%1$s / %2$s</string>
     <string name="download_game_install_processor">Усталяванне %1$s — крок %2$d/%3$d, Java %4$d</string>
     <string name="gd_install_error">Усталяванне не завяршылася. Паўтары спробу; журнал усталёўшчыка latest_process.log даступны ў пашыраных магчымасцях.</string>
+    <string name="gd_back_home">Вярнуцца ў GDWorld</string>
 </resources>

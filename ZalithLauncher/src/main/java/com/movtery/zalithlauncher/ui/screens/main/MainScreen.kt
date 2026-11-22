@@ -28,8 +28,15 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -66,10 +73,10 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
@@ -202,11 +209,12 @@ fun MainScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .safeDrawingPadding()
+                .imePadding()
         ) {
             TopBar(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(40.dp),
+                    .fillMaxWidth(),
                 mainScreenKey = mainScreenKey,
                 inLauncherScreen = inLauncherScreen,
                 taskRunning = tasks.isEmpty(),
@@ -216,6 +224,7 @@ fun MainScreen(
                     screenBackStackModel.mainScreen.backStack.removeFirstOrNull()
                 },
                 toMainScreen = toMainScreen,
+                exitAdvanced = { advanced.value = false },
                 toSettingsScreen = {
                     screenBackStackModel.mainScreen.removeAndNavigateTo(
                         removes = screenBackStackModel.clearBeforeNavKeys,
@@ -266,7 +275,8 @@ fun MainScreen(
                     isExpanded = isTaskMenuExpanded,
                     modifier = Modifier
                         .fillMaxHeight()
-                        .fillMaxWidth(0.3f)
+                        .widthIn(max = 360.dp)
+                        .fillMaxWidth()
                         .align(Alignment.CenterStart)
                         .padding(all = 6.dp)
                 ) {
@@ -287,6 +297,7 @@ private fun <E: TitledNavKey> TopBar(
     contentColor: Color,
     onScreenBack: () -> Unit,
     toMainScreen: () -> Unit,
+    exitAdvanced: () -> Unit,
     toSettingsScreen: () -> Unit,
     toDownloadScreen: () -> Unit,
     toFileManagerScreen: () -> Unit,
@@ -305,198 +316,172 @@ private fun <E: TitledNavKey> TopBar(
     CompositionLocalProvider(
         LocalContentColor provides contentColor
     ) {
-        ConstraintLayout(modifier = modifier) {
-            val (backCenter, title, endButtons) = createRefs()
-
+        BoxWithConstraints(modifier = modifier) {
+            val compact = maxWidth < 600.dp
             val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-
-            Row(
-                modifier = Modifier
-                    .constrainAs(backCenter) {
-                        start.linkTo(parent.start)
-                        top.linkTo(parent.top)
-                        bottom.linkTo(parent.bottom)
+            val navigation: @Composable () -> Unit = {
+                Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = {
+                        if (inLauncherScreen) exitAdvanced()
+                        else backDispatcher?.onBackPressed() ?: onScreenBack()
+                    }) {
+                        Icon(painterResource(R.drawable.ic_arrow_back), stringResource(if (inLauncherScreen) R.string.gd_back_home else R.string.generic_back))
                     }
-                    .fillMaxHeight()
-            ) {
-                AnimatedVisibility(
-                    visible = !inLauncherScreen
-                ) {
-                    Row(modifier = Modifier.fillMaxHeight()) {
-                        Spacer(Modifier.width(12.dp))
-
-                        IconButton(
-                            modifier = Modifier.fillMaxHeight(),
-                            onClick = {
-                                if (!inLauncherScreen) {
-                                    //不在主屏幕时才允许返回
-                                    backDispatcher?.onBackPressed() ?: run {
-                                        onScreenBack()
-                                    }
-                                }
-                            }
-                        ) {
-                            Icon(
-                                modifier = Modifier.size(24.dp),
-                                painter = painterResource(R.drawable.ic_arrow_back),
-                                contentDescription = stringResource(R.string.generic_back)
-                            )
-                        }
-
-                        IconButton(
-                            modifier = Modifier.fillMaxHeight(),
-                            onClick = {
-                                if (!inLauncherScreen) {
-                                    //不在主屏幕时才允许回到主页面
-                                    toMainScreen()
-                                }
-                            }
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_home_filled),
-                                contentDescription = stringResource(R.string.generic_main_menu)
-                            )
+                    if (!inLauncherScreen) {
+                        IconButton(onClick = toMainScreen) {
+                            Icon(painterResource(R.drawable.ic_home_filled), stringResource(R.string.generic_main_menu))
                         }
                     }
-                }
-            }
-            val parentRes = mainScreenKey?.title
-            val childRes = (mainScreenKey as? BackStackNavKey<*>)?.currentKey?.title
+                    val parentRes = mainScreenKey?.title
+                    val childRes = (mainScreenKey as? BackStackNavKey<*>)?.currentKey?.title
 
-            Crossfade(
-                modifier = Modifier.constrainAs(title) {
-                    centerVerticallyTo(parent)
-                    start.linkTo(backCenter.end, margin = 16.dp)
-                },
-                targetState = parentRes to childRes
-            ) { (parent, child) ->
-                val style = MaterialTheme.typography.titleMedium
-                val softWarp = false
-                val maxLines = 1
+                    Crossfade(
+                        modifier = Modifier.weight(1f),
+                        targetState = parentRes to childRes
+                    ) { (parent, child) ->
+                        val style = MaterialTheme.typography.titleMedium
+                        val softWarp = false
+                        val maxLines = 1
 
-                if (parent == null) {
-                    Column(
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        if (festivals.isEmpty()) {
-                            Text(
-                                text = BuildKeys.LAUNCHER_IDENTIFIER,
+                        if (parent == null) {
+                            Column(
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                if (festivals.isEmpty()) {
+                                    Text(
+                                        text = BuildKeys.LAUNCHER_IDENTIFIER,
+                                        style = style,
+                                        softWrap = softWarp,
+                                        maxLines = maxLines,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                } else {
+                                    FestivalTitleText(
+                                        festivals = festivals,
+                                        style = style,
+                                        maxLines = maxLines
+                                    )
+                                }
+                                Text(
+                                    modifier = Modifier.alpha(0.6f),
+                                    text = stringResource(R.string.launcher_fork_subtitle),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    softWrap = softWarp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        } else {
+                            val titleText = if (child != null) {
+                                androidText(parent, androidText(" - "), child)
+                            } else {
+                                parent
+                            }
+
+                            AndroidStringText(
+                                text = titleText,
                                 style = style,
                                 softWrap = softWarp,
-                                maxLines = maxLines
-                            )
-                        } else {
-                            FestivalTitleText(
-                                festivals = festivals,
-                                style = style,
-                                maxLines = maxLines
+                                maxLines = maxLines,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
-                        Text(
-                            modifier = Modifier.alpha(0.6f),
-                            text = stringResource(R.string.launcher_fork_subtitle),
-                            style = MaterialTheme.typography.labelSmall,
-                            softWrap = softWarp,
-                            maxLines = 1
-                        )
-                    }
-                } else {
-                    val titleText = if (child != null) {
-                        androidText(parent, androidText(" - "), child)
-                    } else {
-                        parent
                     }
 
-                    AndroidStringText(
-                        text = titleText,
-                        style = style,
-                        softWrap = softWarp,
-                        maxLines = maxLines
+                }
+            }
+            val shortcuts: @Composable () -> Unit = {
+                Row(
+                    modifier = Modifier
+                        .widthIn(max = if (compact) maxWidth else maxWidth * 0.6f)
+                        .horizontalScroll(rememberScrollState())
+                        .heightIn(min = 48.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    AnimatedVisibility(
+                        visible = !(isTasksExpanded || taskRunning),
+                        enter = slideInVertically(
+                            initialOffsetY = { -50 }
+                        ) + fadeIn(),
+                        exit = slideOutVertically(
+                            targetOffsetY = { -50 }
+                        ) + fadeOut()
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .clip(shape = MaterialTheme.shapes.large)
+                                .clickable { changeExpandedState() }
+                                .padding(all = 8.dp)
+                                .width(120.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            LinearProgressIndicator(modifier = Modifier.weight(1f))
+                            Icon(
+                                modifier = Modifier.size(22.dp),
+                                painter = painterResource(R.drawable.ic_assignment_filled),
+                                contentDescription = stringResource(R.string.main_task_menu)
+                            )
+                        }
+                    }
+
+                    TopBarRailItem(
+                        selected = inRecordingsScreen,
+                        painter = painterResource(R.drawable.ic_videocam_filled),
+                        text = stringResource(R.string.page_title_recordings),
+                        onClick = {
+                            if (!inRecordingsScreen) toRecordingsScreen()
+                        },
+                    )
+
+                    TopBarRailItem(
+                        selected = inFileManagerScreen,
+                        painter = painterResource(R.drawable.ic_folder_filled),
+                        text = stringResource(R.string.page_title_file_manager),
+                        onClick = {
+                            if (!inFileManagerScreen) toFileManagerScreen()
+                        },
+                    )
+
+                    TopBarRailItem(
+                        selected = inMultiplayerScreen,
+                        painter = painterResource(R.drawable.ic_group_filled),
+                        text = stringResource(R.string.terracotta),
+                        onClick = {
+                            if (!inMultiplayerScreen) toMultiplayerScreen()
+                        },
+                    )
+
+                    TopBarRailItem(
+                        selected = inDownloadScreen,
+                        painter = painterResource(R.drawable.ic_download_2_filled),
+                        text = stringResource(R.string.generic_download),
+                        onClick = {
+                            if (!inDownloadScreen) toDownloadScreen()
+                        },
+                    )
+
+                    TopBarRailItem(
+                        selected = inSettingsScreen,
+                        painter = painterResource(R.drawable.ic_settings_filled),
+                        text = stringResource(R.string.generic_setting),
+                        onClick = {
+                            if (!inSettingsScreen) toSettingsScreen()
+                        },
                     )
                 }
             }
-
-            Row(
-                modifier = Modifier
-                    .constrainAs(endButtons) {
-                        top.linkTo(parent.top)
-                        bottom.linkTo(parent.bottom)
-                        end.linkTo(parent.end, margin = 12.dp)
-                    },
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                AnimatedVisibility(
-                    visible = !(isTasksExpanded || taskRunning),
-                    enter = slideInVertically(
-                        initialOffsetY = { -50 }
-                    ) + fadeIn(),
-                    exit = slideOutVertically(
-                        targetOffsetY = { -50 }
-                    ) + fadeOut()
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .clip(shape = MaterialTheme.shapes.large)
-                            .clickable { changeExpandedState() }
-                            .padding(all = 8.dp)
-                            .width(120.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        LinearProgressIndicator(modifier = Modifier.weight(1f))
-                        Icon(
-                            modifier = Modifier.size(22.dp),
-                            painter = painterResource(R.drawable.ic_assignment_filled),
-                            contentDescription = stringResource(R.string.main_task_menu)
-                        )
-                    }
+            if (compact) {
+                Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
+                    navigation()
+                    shortcuts()
                 }
-
-                TopBarRailItem(
-                    selected = inRecordingsScreen,
-                    painter = painterResource(R.drawable.ic_videocam_filled),
-                    text = stringResource(R.string.page_title_recordings),
-                    onClick = {
-                        if (!inRecordingsScreen) toRecordingsScreen()
-                    },
-                )
-
-                TopBarRailItem(
-                    selected = inFileManagerScreen,
-                    painter = painterResource(R.drawable.ic_folder_filled),
-                    text = stringResource(R.string.page_title_file_manager),
-                    onClick = {
-                        if (!inFileManagerScreen) toFileManagerScreen()
-                    },
-                )
-
-                TopBarRailItem(
-                    selected = inMultiplayerScreen,
-                    painter = painterResource(R.drawable.ic_group_filled),
-                    text = stringResource(R.string.terracotta),
-                    onClick = {
-                        if (!inMultiplayerScreen) toMultiplayerScreen()
-                    },
-                )
-
-                TopBarRailItem(
-                    selected = inDownloadScreen,
-                    painter = painterResource(R.drawable.ic_download_2_filled),
-                    text = stringResource(R.string.generic_download),
-                    onClick = {
-                        if (!inDownloadScreen) toDownloadScreen()
-                    },
-                )
-
-                TopBarRailItem(
-                    selected = inSettingsScreen,
-                    painter = painterResource(R.drawable.ic_settings_filled),
-                    text = stringResource(R.string.generic_setting),
-                    onClick = {
-                        if (!inSettingsScreen) toSettingsScreen()
-                    },
-                )
+            } else {
+                Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Box(Modifier.weight(1f)) { navigation() }
+                    shortcuts()
+                }
             }
         }
     }
@@ -512,7 +497,7 @@ private fun TopBarRailItem(
     textStyle: TextStyle = MaterialTheme.typography.labelMedium
 ) {
     TextRailItem(
-        modifier = modifier,
+        modifier = modifier.heightIn(min = 48.dp),
         onClick = onClick,
         text = {
             AnimatedVisibility(visible = selected) {
