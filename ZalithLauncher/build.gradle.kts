@@ -261,6 +261,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     //Test
     testImplementation(libs.junit)
+    testImplementation("org.json:json:20250517")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

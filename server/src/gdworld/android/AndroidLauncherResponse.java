@@ -22,6 +22,8 @@ public class AndroidLauncherResponse extends SimpleResponse {
                 .map(String::trim).anyMatch(sha256::equals);
             if (!accepted) { sendError("android.build.denied"); return; }
             client.checkSign = true;
+            // Match desktop launcher registration so OAuth restore retains CLIENT protections.
+            client.type = pro.gravit.launchserver.socket.response.auth.AuthResponse.ConnectTypes.CLIENT;
             sendResult(new Result());
         } catch (IOException e) {
             sendError("android.build.unavailable");

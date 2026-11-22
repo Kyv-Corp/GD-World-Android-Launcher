@@ -31,11 +31,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -291,17 +295,22 @@ private fun AccountManageContent(
         onDispose { playerSkin.destroy() }
     }
 
-    Row(
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        val compact = maxWidth < 600.dp
+        FlowRow(
         modifier = Modifier
             .fillMaxSize()
+            .then(if (compact) Modifier.verticalScroll(rememberScrollState()) else Modifier)
             .padding(12.dp),
+        maxItemsInEachRow = if (compact) 1 else 2,
+        verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         // ── Left panel: skin preview + add account ──
         Column(
             modifier = Modifier
                 .weight(0.35f)
-                .fillMaxHeight(),
+                .then(if (compact) Modifier.height(420.dp) else Modifier.fillMaxHeight()),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             BackgroundCard(
@@ -471,7 +480,7 @@ private fun AccountManageContent(
         BackgroundCard(
             modifier = Modifier
                 .weight(0.65f)
-                .fillMaxHeight(),
+                .then(if (compact) Modifier.height(400.dp) else Modifier.fillMaxHeight()),
             shape = MaterialTheme.shapes.extraLarge
         ) {
             val accounts = profileUiState.accounts
@@ -551,6 +560,7 @@ private fun AccountManageContent(
                 }
             }
         }
+    }
     }
 
     AccountOperation(operationUiState.accountOp, actions)
@@ -639,11 +649,13 @@ private fun AccountCard(
                     )
                 }
 
+
+            }
                 // Action buttons
-                Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     if (!account.isAuthServerAccount() || account.isElyByAccount()) {
                         IconButton(
-                            modifier = Modifier.size(36.dp),
+                            modifier = Modifier.size(48.dp),
                             onClick = openChangeSkinDialog
                         ) {
                             Icon(
@@ -656,7 +668,7 @@ private fun AccountCard(
                     }
                     if (!account.isLocalAccount()) {
                         IconButton(
-                            modifier = Modifier.size(36.dp),
+                            modifier = Modifier.size(48.dp),
                             onClick = onRefreshClick
                         ) {
                             Icon(
@@ -668,7 +680,7 @@ private fun AccountCard(
                         }
                     }
                     IconButton(
-                        modifier = Modifier.size(36.dp),
+                        modifier = Modifier.size(48.dp),
                         onClick = onCopyUUID
                     ) {
                         Icon(
@@ -679,7 +691,7 @@ private fun AccountCard(
                         )
                     }
                     IconButton(
-                        modifier = Modifier.size(36.dp),
+                        modifier = Modifier.size(48.dp),
                         onClick = onDeleteClick
                     ) {
                         Icon(
@@ -690,7 +702,6 @@ private fun AccountCard(
                         )
                     }
                 }
-            }
 
         }
     }

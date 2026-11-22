@@ -34,7 +34,10 @@ class GravitClient : Closeable {
             if (remaining <= 0) throw IOException("timeout")
             val result = messages.poll(remaining, TimeUnit.NANOSECONDS) ?: throw IOException("timeout")
             if (result.optString("requestUUID") == id || !result.has("requestUUID")) {
-                if (result.has("error") && !result.isNull("error")) throw IOException(result.optString("error").takeIf { it.matches(Regex("[a-zA-Z0-9_.-]{1,80}")) } ?: "server")
+                if (result.has("error") && !result.isNull("error")) {
+                    val code = result.optString("error").takeIf { it.matches(Regex("[a-zA-Z0-9_.-]{1,80}")) } ?: "server"
+                    throw IOException(if (code == "auth.trylater") com.movtery.zalithlauncher.context.GlobalContext.getString(com.movtery.zalithlauncher.R.string.gd_auth_wait) else code)
+                }
                 if (result.optString("type") == type) return result
             }
         }
@@ -55,16 +58,7 @@ class GravitClient : Closeable {
 
     fun restore(): JSONObject {
         registerBuild()
-        val session = GdSession.read() ?: throw IOException("login")
-        val refreshed = request("refreshToken", JSONObject().put("authId", "std").put("refreshToken", session.getJSONObject("oauth").getString("refreshToken")))
-        session.put("oauth", refreshed.getJSONObject("oauth"))
-        GdSession.write(session)
-        val result = request("auth", JSONObject().put("login", session.getJSONObject("playerProfile").getString("username"))
-            .put("password", JSONObject().put("type", "oauth").put("accessToken", session.getJSONObject("oauth").getString("accessToken")))
-            .put("auth_id", "std").put("authType", "CLIENT").put("getSession", false))
-        result.put("oauth", session.getJSONObject("oauth"))
-        GdSession.write(result)
-        return result
+        return GdSession.restore(::request)
     }
 
     override fun close() { socket.close(1000, null) }

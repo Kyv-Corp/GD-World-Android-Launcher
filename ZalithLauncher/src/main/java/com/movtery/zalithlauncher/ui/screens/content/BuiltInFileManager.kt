@@ -28,6 +28,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -74,6 +77,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -158,7 +162,8 @@ fun BuiltInFileManagerScreen(
     }
     var refreshCounter by remember { mutableStateOf(0) }
 
-    var sidebarVisible by rememberSaveable { mutableStateOf(true) }
+    val compact = LocalConfiguration.current.screenWidthDp < 600
+    var sidebarVisible by rememberSaveable(compact) { mutableStateOf(!compact) }
 
     var gameSectionExpanded by rememberSaveable { mutableStateOf(true) }
     var contentSectionExpanded by rememberSaveable { mutableStateOf(false) }
@@ -276,11 +281,8 @@ fun BuiltInFileManagerScreen(
         currentKey = backStackViewModel.mainScreen.currentKey,
         useClassEquality = true
     ) { isVisible ->
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
+        BoxWithConstraints(Modifier.fillMaxSize().padding(if (compact) 8.dp else 16.dp)) {
+            val sidebar: @Composable () -> Unit = {
             AnimatedVisibility(
                 visible = sidebarVisible,
                 enter = slideInHorizontally(SidebarSlideEnterSpec) { -it } +
@@ -291,7 +293,7 @@ fun BuiltInFileManagerScreen(
                 Row(modifier = Modifier.fillMaxHeight()) {
                     Column(
                         modifier = Modifier
-                            .width(SIDEBAR_WIDTH)
+                            .width(if (compact) 280.dp else SIDEBAR_WIDTH)
                             .fillMaxHeight()
                     ) {
                         val hasClipboard = clipboardFiles.isNotEmpty()
@@ -393,7 +395,7 @@ fun BuiltInFileManagerScreen(
                                         icon = R.drawable.ic_folder_outlined,
                                         label = stringResource(R.string.file_manager_game_folder),
                                         selected = inGameRoot,
-                                        onClick = { currentDirectory = rootDirectory }
+                                        onClick = { currentDirectory = rootDirectory; if (compact) sidebarVisible = false }
                                     )
                                 }
 
@@ -462,6 +464,8 @@ fun BuiltInFileManagerScreen(
                 }
             }
 
+            }
+            val browser: @Composable () -> Unit = {
             VersionChunkBackground(
                 modifier = Modifier.fillMaxSize(),
                 paddingValues = PaddingValues()
@@ -469,11 +473,11 @@ fun BuiltInFileManagerScreen(
                 Column(modifier = Modifier.fillMaxSize()) {
                     CardTitleLayout(modifier = Modifier.fillMaxWidth()) {
                         if (selectionMode) {
-                            Row(
+                            FlowRow(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(horizontal = 4.dp, vertical = 4.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                itemVerticalAlignment = Alignment.CenterVertically
                             ) {
                                 IconButton(onClick = { sidebarVisible = !sidebarVisible }) {
                                     Icon(
@@ -601,12 +605,12 @@ fun BuiltInFileManagerScreen(
                                 }
                             }
                         } else {
-                            Row(
+                            FlowRow(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(horizontal = 8.dp)
                                     .padding(top = 4.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                itemVerticalAlignment = Alignment.CenterVertically
                             ) {
                                 IconButton(onClick = { sidebarVisible = !sidebarVisible }) {
                                     Icon(
@@ -643,6 +647,7 @@ fun BuiltInFileManagerScreen(
 
                                 SimpleTextInputField(
                                     modifier = Modifier
+                                        .widthIn(min = 180.dp)
                                         .weight(1f)
                                         .padding(start = 4.dp),
                                     value = searchQuery,
@@ -927,6 +932,19 @@ fun BuiltInFileManagerScreen(
                             }
                         }
                     }
+                }
+            }
+            }
+            if (compact) {
+                browser()
+                if (sidebarVisible) {
+                    Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)).clickable { sidebarVisible = false })
+                    Surface(Modifier.width(292.dp).fillMaxHeight(), shape = MaterialTheme.shapes.large) { sidebar() }
+                }
+            } else {
+                Row(Modifier.fillMaxSize()) {
+                    sidebar()
+                    browser()
                 }
             }
         }
@@ -1592,10 +1610,10 @@ private fun PropertyRow(label: String, value: String) {
 
 @Composable
 private fun formatBytesShort(bytes: Long): String = when {
-    bytes < 1_024L -> "$bytes ${stringResource(R.string.file_manager_bytes)}"
-    bytes < 1_024L * 1_024L -> "%.1f ${stringResource(R.string.file_manager_kb)}".format(bytes / 1_024.0)
-    bytes < 1_024L * 1_024L * 1_024L -> "%.1f ${stringResource(R.string.file_manager_mb)}".format(bytes / (1_024.0 * 1_024.0))
-    else -> "%.2f ${stringResource(R.string.file_manager_gb)}".format(bytes / (1_024.0 * 1_024.0 * 1_024.0))
+    bytes < 1_024L -> stringResource(R.string.file_manager_bytes, bytes)
+    bytes < 1_024L * 1_024L -> stringResource(R.string.file_manager_kb, bytes / 1_024.0)
+    bytes < 1_024L * 1_024L * 1_024L -> stringResource(R.string.file_manager_mb, bytes / (1_024.0 * 1_024.0))
+    else -> stringResource(R.string.file_manager_gb, bytes / (1_024.0 * 1_024.0 * 1_024.0))
 }
 
 private fun formatFileDate(millis: Long): String =

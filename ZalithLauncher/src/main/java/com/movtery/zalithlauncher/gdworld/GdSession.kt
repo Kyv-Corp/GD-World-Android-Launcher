@@ -36,5 +36,8 @@ object GdSession {
         pending.writeText(data.toString())
         check(pending.renameTo(file))
     }
+    @Synchronized fun restore(request: (String, JSONObject) -> JSONObject): JSONObject =
+        restoreGdSession(read() ?: throw java.io.IOException("login"), request, ::write)
+
     @Synchronized fun clear() { check(!file.exists() || file.delete()) }
 }

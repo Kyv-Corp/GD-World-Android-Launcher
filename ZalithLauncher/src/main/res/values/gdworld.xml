@@ -32,4 +32,6 @@
     <string name="download_game_install_processor">Installing %1$s — step %2$d/%3$d, Java %4$d</string>
     <string name="gd_install_error">Installation did not finish. Retry; the installer log is latest_process.log in Advanced features.</string>
     <string name="gd_back_home">Back to GDWorld</string>
+    <string name="gd_auth_wait">Too many sign-in attempts. Wait 10 seconds and try again; restarting the app is unnecessary.</string>
+    <string name="gd_about_upstream">GDWorld Android is based on Zalith Launcher 2 by MovTery and ZalithLauncher2Plus by Star1xr. GDWorld integration: Kyv-Corp. Source code: GPLv3.</string>
 </resources>

@@ -25,7 +25,7 @@ public final class AndroidLauncherTest {
         }
         Response accepted = new Response(); accepted.sha256 = known; accepted.execute(null, client);
         assert client.checkSign && accepted.success;
-        assert !client.isAuth && client.uuid == null && client.type == null;
+        assert !client.isAuth && client.uuid == null && client.type == pro.gravit.launchserver.socket.response.auth.AuthResponse.ConnectTypes.CLIENT;
         client.isAuth = true;
         Response already = new Response(); already.sha256 = known; already.execute(null, client);
         assert !already.success && already.error != null;

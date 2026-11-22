@@ -43,76 +43,20 @@ import com.movtery.zalithlauncher.ui.components.BackgroundCard
 fun AboutDialog(
     onDismissRequest: () -> Unit
 ) {
-    Dialog(
+    AlertDialog(
         onDismissRequest = onDismissRequest,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
-    ) {
-        BackgroundCard(
-            modifier = Modifier
-                .fillMaxWidth(0.9f)
-                .fillMaxHeight(0.8f)
-                .padding(16.dp),
-            shape = MaterialTheme.shapes.extraLarge
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(24.dp)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.img_launcher),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(80.dp)
-                        .clip(MaterialTheme.shapes.medium),
-                    contentScale = ContentScale.Fit
-                )
-                
-                Text(
-                    text = BuildKeys.LAUNCHER_NAME,
-                    style = MaterialTheme.typography.headlineSmall
-                )
-                
-                Text(
-                    text = stringResource(R.string.about_launcher_version, BuildConfig.VERSION_NAME),
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.alpha(0.7f)
-                )
-
-                HorizontalDivider()
-
-                Text(
-                    text = stringResource(R.string.about_launcher_author_movtery_title),
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text(
-                    text = stringResource(R.string.about_launcher_author_movtery_text),
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.alpha(0.7f)
-                )
-
-                Text(
-                    text = stringResource(R.string.about_launcher_author_star1xr_title),
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text(
-                    text = stringResource(R.string.about_launcher_author_star1xr_text, BuildKeys.LAUNCHER_NAME),
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.alpha(0.7f)
-                )
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                Button(
-                    onClick = onDismissRequest,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = stringResource(R.string.generic_confirm))
-                }
+        icon = {
+            Image(painterResource(R.drawable.gd_logo), null, Modifier.size(64.dp), contentScale = ContentScale.Fit)
+        },
+        title = { Text(BuildKeys.LAUNCHER_NAME) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                Text(stringResource(R.string.about_launcher_version, BuildConfig.VERSION_NAME))
+                Text(stringResource(R.string.gd_about_upstream))
             }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismissRequest) { Text(stringResource(R.string.generic_confirm)) }
         }
-    }
+    )
 }

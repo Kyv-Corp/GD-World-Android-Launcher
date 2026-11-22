@@ -153,6 +153,16 @@ class OfflineYggdrasilServer(
                         catch (_: Exception) { call.respond(HttpStatusCode.BadGateway) }
                     } else runCatched { call.respondText(profile(call), ContentType.Application.Json) }
                 }
+                post("/minecraftservices/player/certificates") {
+                    val account = gdworldAccount
+                    when {
+                        account == null -> call.respond(HttpStatusCode.NotFound)
+                        call.request.headers["Authorization"] != "Bearer ${account.accessToken}" -> call.respond(HttpStatusCode.Unauthorized)
+                        // GDWorld does not issue Mojang chat certificates. Absence is valid;
+                        // authlib-injector's dummy AA== signature is not.
+                        else -> call.respond(HttpStatusCode.NoContent)
+                    }
+                }
                 get("/textures/{hash}") {
                     runCatched { call.respond(texture(call)) }
                 }
@@ -242,6 +252,7 @@ class OfflineYggdrasilServer(
                 put("implementationName", JsonPrimitive(implementationName))
                 put("implementationVersion", JsonPrimitive(implementationVersion))
                 put("feature.non_email_login", JsonPrimitive(true))
+                if (gdworldAccount != null) put("feature.enable_profile_key", JsonPrimitive(true))
             })
             put("signaturePublickey", JsonPrimitive(keyPair.public.toPEMPublicKey()))
         }.toString()

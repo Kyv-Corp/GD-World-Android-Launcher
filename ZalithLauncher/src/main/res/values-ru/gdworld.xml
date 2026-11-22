@@ -32,4 +32,6 @@
     <string name="download_game_install_processor">Установка %1$s — шаг %2$d/%3$d, Java %4$d</string>
     <string name="gd_install_error">Установка не завершилась. Повтори попытку; журнал установщика latest_process.log доступен в расширенных возможностях.</string>
     <string name="gd_back_home">Вернуться в GDWorld</string>
+    <string name="gd_auth_wait">Слишком частые попытки входа. Подожди 10 секунд и повтори; перезапуск приложения не требуется.</string>
+    <string name="gd_about_upstream">GDWorld Android основан на Zalith Launcher 2 от MovTery и ZalithLauncher2Plus от Star1xr. Интеграция GDWorld: Kyv-Corp. Исходный код: GPLv3.</string>
 </resources>

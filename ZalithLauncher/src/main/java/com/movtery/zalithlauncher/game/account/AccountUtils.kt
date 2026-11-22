@@ -397,7 +397,9 @@ fun addOtherServer(
  */
 @Composable
 fun getAccountTypeName(account: Account): String {
-    return if (account.isMicrosoftAccount()) {
+    return if (account.accountType == "GDWorld") {
+        "GDWorld"
+    } else if (account.isMicrosoftAccount()) {
         stringResource(R.string.account_type_microsoft)
     } else if (account.isAuthServerAccount()) {
         account.accountType ?: "Unknown"
