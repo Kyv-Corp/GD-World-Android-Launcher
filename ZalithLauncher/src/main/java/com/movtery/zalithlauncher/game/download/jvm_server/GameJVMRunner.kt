@@ -81,7 +81,8 @@ suspend fun runJvmRetryRuntimes(
                 jre = jre,
                 userHome = userHome,
                 postSummary = postSummary,
-                postProgress = postProgress
+                postProgress = postProgress,
+                start = start
             )
         } ?: throw JvmCrashException(exitCode)
     }
