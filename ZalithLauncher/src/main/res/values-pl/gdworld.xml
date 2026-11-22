@@ -34,4 +34,5 @@
     <string name="gd_back_home">Powrót do GDWorld</string>
     <string name="gd_auth_wait">Zbyt wiele prób logowania. Poczekaj 10 sekund i spróbuj ponownie; ponowne uruchomienie aplikacji nie jest potrzebne.</string>
     <string name="gd_about_upstream">GDWorld Android bazuje na Zalith Launcher 2 autorstwa MovTery i ZalithLauncher2Plus autorstwa Star1xr. Integracja GDWorld: Best_Jaro, Endayt (Kyv-Corp). Kod źródłowy: GPLv3.</string>
+    <string name="generic_share">Udostępnij</string>
 </resources>

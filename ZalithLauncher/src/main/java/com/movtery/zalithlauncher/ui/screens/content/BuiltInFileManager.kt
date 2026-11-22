@@ -104,6 +104,7 @@ import com.movtery.zalithlauncher.ui.screens.content.versions.layouts.VersionChu
 import com.movtery.zalithlauncher.ui.theme.itemColor
 import com.movtery.zalithlauncher.ui.theme.onItemColor
 import com.movtery.zalithlauncher.utils.animation.getAnimateTween
+import com.movtery.zalithlauncher.utils.file.shareFile
 import com.movtery.zalithlauncher.utils.logging.Logger
 import com.movtery.zalithlauncher.viewmodel.ErrorViewModel
 import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
@@ -906,6 +907,14 @@ fun BuiltInFileManagerScreen(
                                                 selectedPaths = setOf(file.absolutePath)
                                             }
                                         },
+                                        onShare = {
+                                            runCatching { shareFile(context, file) }.onFailure { error ->
+                                                submitError(ErrorViewModel.ThrowableMessage(
+                                                    title = androidText(R.string.generic_error),
+                                                    message = androidText(error.message ?: error.javaClass.simpleName)
+                                                ))
+                                            }
+                                        },
                                         onRename = {
                                             renameText = file.name
                                             selectedFile = file
@@ -1418,6 +1427,7 @@ private fun FileItemLayout(
     onCheckedChange: (Boolean) -> Unit,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
+    onShare: () -> Unit,
     onRename: () -> Unit,
     onCopy: () -> Unit,
     onCut: () -> Unit,
@@ -1502,6 +1512,13 @@ private fun FileItemLayout(
                             onDismissRequest = { menuExpanded = false },
                             shape = MaterialTheme.shapes.large
                         ) {
+                            if (file.isFile) {
+                                DropdownMenuItem(
+                                    leadingIcon = { Icon(painterResource(R.drawable.ic_share_filled), null) },
+                                    text = { Text(stringResource(R.string.generic_share)) },
+                                    onClick = { menuExpanded = false; onShare() }
+                                )
+                            }
                             DropdownMenuItem(
                                 leadingIcon = {
                                     Icon(painterResource(R.drawable.ic_edit_outlined), null)
