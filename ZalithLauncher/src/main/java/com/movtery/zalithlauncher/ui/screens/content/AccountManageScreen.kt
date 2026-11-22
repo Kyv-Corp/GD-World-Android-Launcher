@@ -31,7 +31,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
@@ -297,20 +296,9 @@ private fun AccountManageContent(
 
     BoxWithConstraints(Modifier.fillMaxSize()) {
         val compact = maxWidth < 600.dp
-        FlowRow(
-        modifier = Modifier
-            .fillMaxSize()
-            .then(if (compact) Modifier.verticalScroll(rememberScrollState()) else Modifier)
-            .padding(12.dp),
-        maxItemsInEachRow = if (compact) 1 else 2,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        // ── Left panel: skin preview + add account ──
+        val preview: @Composable (Modifier) -> Unit = { panelModifier ->
         Column(
-            modifier = Modifier
-                .weight(0.35f)
-                .then(if (compact) Modifier.height(420.dp) else Modifier.fillMaxHeight()),
+            modifier = panelModifier,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             BackgroundCard(
@@ -475,12 +463,10 @@ private fun AccountManageContent(
                 }
             }
         }
-
-        // ── Right panel: account cards with drag-and-drop ──
+        }
+        val accounts: @Composable (Modifier) -> Unit = { panelModifier ->
         BackgroundCard(
-            modifier = Modifier
-                .weight(0.65f)
-                .then(if (compact) Modifier.height(400.dp) else Modifier.fillMaxHeight()),
+            modifier = panelModifier,
             shape = MaterialTheme.shapes.extraLarge
         ) {
             val accounts = profileUiState.accounts
@@ -560,7 +546,22 @@ private fun AccountManageContent(
                 }
             }
         }
-    }
+        }
+        // FlowRow measures lazy children intrinsically; Row/Column must provide their bounds directly.
+        if (compact) {
+            Column(
+                Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                preview(Modifier.fillMaxWidth().height(420.dp))
+                accounts(Modifier.fillMaxWidth().height(400.dp))
+            }
+        } else {
+            Row(Modifier.fillMaxSize().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                preview(Modifier.weight(0.35f).fillMaxHeight())
+                accounts(Modifier.weight(0.65f).fillMaxHeight())
+            }
+        }
     }
 
     AccountOperation(operationUiState.accountOp, actions)

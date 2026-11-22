@@ -1,149 +1,149 @@
-# 自定义主页使用指南！
+# Custom Homepage User Guide!
 
-欢迎使用 Zalith Launcher2 的自定义主页！你可以使用 **Markdown** 语法来编写主页！  
-除了标准 Markdown 外，你还可以使用以下扩展组件来丰富你的主页
+Welcome to Zalith Launcher2's custom homepage! You can use **Markdown** syntax to write your homepage!
+In addition to standard Markdown, you can also use the following extension components to enrich your homepage.
 
-### 扩展规则
-- **注释**:
-    - 以 `//` 开头的行都会被忽略，你可以使用注释来对某些内容进行解释说明
-    - 但 Markdown 代码块中的注释行不会被忽略
-- **组件**:
-    - 扩展组件以 `...` 开头，例如 `...button`
-    - 组件支持使用属性，来控制外观或者行为，在组件行空一格开始，可填写对应的属性
+### Extension Rules
+- **Comments**:
+    - Lines starting with `//` are ignored. You can use comments to explain certain content.
+    - However, comment lines inside Markdown code blocks are NOT ignored.
+- **Components**:
+    - Extension components start with `...`, e.g. `...button`.
+    - Components support attributes to control appearance or behavior. After a space on the component line, you can fill in the corresponding attributes.
 
-//这是一行注释，你只能在编辑文件的时候看见我！
+//This is a comment line, you can only see me when editing the file!
 
 ---
 
-### 随机文本块
-在一个区块内填入多段文本，主页在加载时，将随机显示其中的一段文本
+### Random Text Block
+Place multiple text segments within a block. When the homepage loads, one of the segments will be randomly displayed.
 
-**语法**  
+**Syntax**
 ...random-start
-这是一段文本，权重默认为 1.0
-weight(2.0): 这是第二段文本，权重被配置为 2.0
-这是第三段文本
+This is a piece of text, weight defaults to 1.0
+weight(2.0): This is the second piece of text, weight is set to 2.0
+This is the third piece of text
 ...random-end
 
-**参数说明：**
-- 与其他组件不同，该组件的参数为内嵌参数，直接嵌入到实际值行首
-- `weight`: 
-  - 可填写该段文本的具体的权重值，支持整数、小数，可选
-  - 主页将按权重随机抽取文本
+**Parameter description:**
+- Unlike other components, this component uses inline parameters, embedded directly at the beginning of the actual value line.
+- `weight`:
+    - Specifies the weight value for this piece of text. Supports integers and decimals. Optional.
+    - The homepage will randomly select a piece of text according to the weights.
 
-> 该组件仅支持在基础的 Markdown 内使用
-> 该组件不会生效于标准 Markdown 容器或其他扩展组件内
+> This component is only supported within standard Markdown.
+> This component will NOT take effect inside standard Markdown containers or other extension components.
 
 ---
 
-### 卡片组件
-用于将内容包裹在一个有背景和圆角的容器中
+### Card Component
+Used to wrap content inside a container with a background and rounded corners.
 
-**语法：**
-...card-start title="我的卡片" shape=large contentPadding=(16, 12)
-这里是卡片内部的内容，支持标准 **Markdown**
-...card-end
-
-**参数说明：**
-- `title`: 卡片标题，可选，不存在或不填写时，卡片会不显示标题块
-...card-start title="示例"
-这个卡片展示了如何**配置标题**
-...card-end
-- `shape`: 圆角大小，可选
-    - 支持使用预设大小，由 MaterialTheme 提供：`extraSmall`, `small`, `medium`, `large`, `extraLarge`
-    - 可以使用具体的数值来控制圆角大小：`12dp`，支持整数小数
-    - 可以使用百分比圆角大小，如：`20%`，仅支持整数百分比
-    - 由于该属性的数值是区分单位的，所以必须带上单位，否则该属性不生效
-...card-start title="形状示例" shape=medium
-中等圆角的卡片！
+**Syntax:**
+...card-start title="My Card" shape=large contentPadding=(16, 12)
+Here is the content inside the card, supporting standard **Markdown**.
 ...card-end
 
-...card-start title="形状示例" shape=4dp
-4dp 圆角的卡片！
+**Parameter description:**
+- `title`: Card title, optional. If not present or left empty, the card will not show the title block.
+...card-start title="Example"
+This card demonstrates how to **configure a title**.
+...card-end
+- `shape`: Corner radius, optional.
+    - You can use preset sizes provided by MaterialTheme: `extraSmall`, `small`, `medium`, `large`, `extraLarge`.
+    - You can use a specific numeric value to control the corner radius: `12dp` (supports integers and decimals).
+    - You can also use a percentage corner radius, e.g., `20%` (only integer percentages supported).
+    - Because this attribute distinguishes units, you must include the unit, otherwise the attribute will not take effect.
+...card-start title="Shape Example" shape=medium
+A card with medium rounded corners!
 ...card-end
 
-...card-start title="形状示例" shape=20%
-20% 圆角的卡片！
+...card-start title="Shape Example" shape=4dp
+A card with 4dp rounded corners!
 ...card-end
-- `contentPadding`: 控制卡片的内边距
-    - 格式：`(all)`, `(horizontal, vertical)`, `(left, top, right, bottom)`，支持整数、小数
-    - 由于该属性的数值的单位只能是 `dp`，所以此处无需带上单位，否则该属性不生效
-...card-start title="内容内边距示例" contentPadding=(12)
+
+...card-start title="Shape Example" shape=20%
+A card with 20% rounded corners!
+...card-end
+- `contentPadding`: Controls the inner padding of the card.
+    - Format: `(all)`, `(horizontal, vertical)`, `(left, top, right, bottom)`. Supports integers and decimals.
+    - Since the unit for this attribute can only be `dp`, you do NOT need to include the unit; otherwise the attribute will not take effect.
+...card-start title="Content Padding Example" contentPadding=(12)
 contentPadding=(12)
 ...card-end
 
-...card-start title="内容内边距示例" contentPadding=(12, 8)
+...card-start title="Content Padding Example" contentPadding=(12, 8)
 contentPadding=(12, 8)
 ...card-end
 
-...card-start title="内容内边距示例" contentPadding=(4, 4, 12, 12)
+...card-start title="Content Padding Example" contentPadding=(4, 4, 12, 12)
 contentPadding=(4, 4, 12, 12)
 ...card-end
 
-> 卡片组件不支持 `width` 和 `weight` 属性，其宽度始终跟随主页宽度
-> 卡片组件为不可组合组件，它不能被装进布局组件（Row/Column）中
+> The card component does not support `width` and `weight` attributes; its width always follows the homepage width.
+> The card component is non-composable; it cannot be placed inside layout components (Row/Column).
 
 ---
 
-### 按钮组件
-创建一个可以点击的按钮
+### Button Component
+Creates a clickable button.
 
-**语法：**
-...button text="访问哔哩哔哩" event="url {https://www.bilibili.com/}"
-...button-outlined text="检查更新" event="check_update"
+**Syntax:**
+...button text="Visit YouTube" event="url {https://www.youtube.com/}"
+...button-outlined text="Check for updates" event="check_update"
 
-**按钮样式：**
-- `...button`: 填充样式
-...button text="填充样式"
-- `...button-outlined`: 外框样式
-...button-outlined text="外框样式"
-- `...button-filled-tonal`: 色调填充样式
-...button-filled-tonal text="色调填充样式"
-- `...button-text`: 纯文字样式
-...button-text text="纯文字样式"
+**Button styles:**
+- `...button`: Filled style
+...button text="Filled style"
+- `...button-outlined`: Outlined style
+...button-outlined text="Outlined style"
+- `...button-filled-tonal`: Filled tonal style
+...button-filled-tonal text="Filled tonal style"
+- `...button-text`: Text-only style
+...button-text text="Text-only style"
 
-**参数说明：**
-- `text`: 按钮显示的文字，必填，值需使用双引号包裹
-- `event`: 触发的事件，可选，值需使用双引号包裹，使用花括号包裹事件数据
-    - `url{...}`: 在浏览器中打开链接
-    - `check_update`: 触发启动器检查更新
-    - `launch_game{server=...}`: 启动当前选中的版本
-      - 参数 `server`：指定快速启动并加入的服务器，可选
-    - `copy{...}`: 复制指定内容
-    - `refresh_page`: 刷新当前主页
-    - `share_game_log`: 分享当前游戏版本的日志
-- `width`: 按钮的宽度，可选
-    - 可使用百分比宽度，会根据主页的实际宽度、所在布局组件的宽度计算：`50%`，仅支持整数百分比
-    - 可使用 DP 单位来设置更具体的宽度：`200dp`，支持整数、小数
-    - 由于该属性的数值是区分单位的，所以必须带上单位，否则该属性不生效
-    - 示例：
-      ...button text="按钮1" width=50%
-      ...button text="按钮2" width=120dp
-- `shape`: 按钮的形状，可选，与卡片的形状参数一致
-- `weight`: 仅在 Row 或 Column 内部可用，见下方布局组件的说明
+**Parameter description:**
+- `text`: The text displayed on the button, required. The value must be wrapped in double quotes.
+- `event`: The event to trigger, optional. The value must be wrapped in double quotes, and event data is wrapped in curly braces.
+    - `url{...}`: Opens a link in the browser.
+    - `check_update`: Triggers the launcher to check for updates.
+    - `launch_game{server=...}`: Launches the currently selected version.
+      - Parameter `server`: Specifies the server to quick-join after launch, optional.
+    - `copy{...}`: Copies the specified content.
+    - `refresh_page`: Refreshes the current homepage.
+    - `share_game_log`: Shares the log of the current game version.
+- `width`: The width of the button, optional.
+    - You can use a percentage width, calculated based on the actual width of the homepage and the containing layout component: `50%` (only integer percentages supported).
+    - You can use DP units to set a more specific width: `200dp` (supports integers and decimals).
+    - Because this attribute distinguishes units, you must include the unit, otherwise the attribute will not take effect.
+    - Examples:
+      ...button text="Button 1" width=50%
+      ...button text="Button 2" width=120dp
+- `shape`: Corner radius of the button, same as the shape parameter for cards.
+- `weight`: Only available inside Row or Column, see the layout component sections below.
 
-> 按钮属于内容组件，若未显式指定 `width` 或 `weight`，其宽度由文字长度决定（受容器限制不会超出主页）
+> The button is a content component. If `width` or `weight` is not explicitly specified, its width is determined by the text length (limited by the container so it does not exceed the homepage).
 
 ---
 
-### 横向布局 (`Row`)
-将多个组件或布局组件横向排版  
-这个组件对齐的是 Jetpack Compose 中的 Row 组件
+### Horizontal Layout (`Row`)
+Lays out multiple components or layout components horizontally.
+This component aligns with the Row component in Jetpack Compose.
 
-**语法：**
+**Syntax:**
 ...row-start horizontal=spacedBy(8) vertical=Center
-    ...button text="按钮1" weight=(1)
-    ...button text="按钮2" weight=(1)
+    ...button text="Button 1" weight=(1)
+    ...button text="Button 2" weight=(1)
 ...row-end
 
-**参数说明：**
-- `horizontal`: 水平排列参数
-    - 可使用的排列方式：`Start`, `Center`, `End`, `SpaceEvenly`, `SpaceBetween`, `SpaceAround`
-    - 可使用 `spacedBy` 控制子项之间的距离：
-        - 仅控制距离：`spacedBy(12)`，支持整数、小数
-        - 控制距离的同时，控制水平排列方式：`spacedBy(12, Start)`，此处仅支持使用值：`Start`, `Center`, `End`
-        - 该属性的数值的单位只能是 `dp`，所以此处无需带上单位，否则该属性不生效
-    - 示例：
+**Parameter description:**
+- `horizontal`: Horizontal arrangement parameters.
+    - Available arrangements: `Start`, `Center`, `End`, `SpaceEvenly`, `SpaceBetween`, `SpaceAround`.
+    - You can use `spacedBy` to control the distance between child items:
+        - Distance only: `spacedBy(12)` (supports integers and decimals).
+        - Control both distance and horizontal alignment: `spacedBy(12, Start)`. Only the values `Start`, `Center`, `End` are supported here.
+        - The unit for this attribute can only be `dp`, so you do NOT need to include the unit; otherwise the attribute will not take effect.
+    - Examples:
 ...row-start horizontal=Start
 ...button text="Start"
 ...button text="Start"
@@ -158,121 +158,121 @@ contentPadding=(4, 4, 12, 12)
 ...button text="spacedBy(12, End)"
 ...button text="spacedBy(12, End)"
 ...row-end
-- `vertical`: 垂直对齐
-    - 可使用的排列方式：`Top`, `Center` (或更符合语义的 `CenterVertically`), `Bottom`
-    - 垂直居中示例：
+- `vertical`: Vertical alignment.
+    - Available alignments: `Top`, `Center` (or the more semantic `CenterVertically`), `Bottom`.
+    - Example of vertical centering:
 ...row-start vertical=Center
 ...button text="Center"
-...image url="https://www.baidu.com/img/flexible/logo/pc/result.png" width=10%
+...image url="https://www.gstatic.com/images/branding/googlelogo/svg/googlelogo_clr_74x24px.svg" width=10%
 ...row-end
-- **子项属性 `weight`**:
-    - 这是仅在 Row 组件内部可使用的属性，用于分配子组件的宽度
-    - 可填写具体的权重值，将会根据主页的实际宽度为子组件分配宽度，支持整数、小数
-    - 若添加 `noFill` 配置，则会使组件占有该权重的宽度，但组件并不会真的填满该区域（例如按钮可能仍然保持内容宽度）
-    - 该属性的数值没有单位，仅表示比例
-      - 示例：
+- **Child attribute `weight`**:
+    - This attribute can only be used inside a Row component, used to allocate width to child components.
+    - You can specify a weight value (supports integers and decimals), and the child's width will be allocated according to the actual width of the homepage.
+    - If you add the `noFill` configuration, the component will take the width corresponding to that weight, but it will not actually fill the allocated area (e.g., a button may still keep its content width).
+    - The value of this attribute has no unit; it only represents a proportion.
+      - Examples:
 ...row-start
-  ...button text="按钮1" weight=(1)
-  ...button text="按钮2" weight=(1)
+  ...button text="Button 1" weight=(1)
+  ...button text="Button 2" weight=(1)
 ...row-end
 ...row-start
-  ...button text="按钮1" weight=(1)
-  ...button text="按钮2" weight=(1, noFill)
+  ...button text="Button 1" weight=(1)
+  ...button text="Button 2" weight=(1, noFill)
 ...row-end
-- `width`: 布局组件的宽度，可选，与按钮的属性一致；若该组件是根组件，则默认值为 `100%`
+- `width`: The width of the layout component, optional, same as the button's width attribute; if this component is the root component, the default value is `100%`.
 
-> Row 或 Column 内部可放置按钮、图片、或嵌套的 Row/Column 组件
-> 当然也可以放置 Markdown 文本，不过 Markdown 文本不能像其他高级组件一样，进行缩进处理！否则会出现渲染异常
+> Inside Row or Column, you can place buttons, images, or nested Row/Column components.
+> You can also place Markdown text, but Markdown text cannot be indented like other advanced components, otherwise rendering anomalies may occur!
 
 ---
 
-### 纵向布局 (`Column`)
-将多个组件或布局组件纵向排版  
-这个组件对齐的是 Jetpack Compose 中的 Column 组件
+### Vertical Layout (`Column`)
+Lays out multiple components or layout components vertically.
+This component aligns with the Column component in Jetpack Compose.
 
-**语法：**
+**Syntax:**
 ...column-start vertical=spacedBy(8) horizontal=Center
-    ...button text="按钮1"
-    ...button text="按钮2"
+    ...button text="Button 1"
+    ...button text="Button 2"
 ...column-end
 
-**参数说明：**
-- `vertical`: 垂直排列参数
-    - 可使用的排列方式：`Top`, `Center`, `Bottom`, `SpaceEvenly`, `SpaceBetween`, `SpaceAround`
-    - 可使用 `spacedBy` 控制子项之间的距离：
-        - 仅控制距离：`spacedBy(12)`，支持整数、小数
-        - 控制距离的同时，控制垂直排列方式：`spacedBy(12, Top)`，此处仅支持使用值：`Top`, `Center`, `Bottom`
-        - 该属性的数值的单位只能是 `dp`，所以此处无需带上单位，否则该属性不生效
-    - 示例：
+**Parameter description:**
+- `vertical`: Vertical arrangement parameters.
+    - Available arrangements: `Top`, `Center`, `Bottom`, `SpaceEvenly`, `SpaceBetween`, `SpaceAround`.
+    - You can use `spacedBy` to control the distance between child items:
+        - Distance only: `spacedBy(12)` (supports integers and decimals).
+        - Control both distance and vertical alignment: `spacedBy(12, Top)`. Only the values `Top`, `Center`, `Bottom` are supported here.
+        - The unit for this attribute can only be `dp`, so you do NOT need to include the unit; otherwise the attribute will not take effect.
+    - Example:
 ...column-start vertical=spacedBy(8)
-  ...button text="按钮1"
-  ...button text="按钮2"
+  ...button text="Button 1"
+  ...button text="Button 2"
 ...column-end
-- `horizontal`: 水平对齐
-    - 可使用的对齐方式：`Start`, `Center` (或更符合语义的 `CenterHorizontally`), `End`
-    - 水平居中示例：
+- `horizontal`: Horizontal alignment.
+    - Available alignments: `Start`, `Center` (or the more semantic `CenterHorizontally`), `End`.
+    - Example of horizontal centering:
 ...column-start horizontal=Center
-  ...button text="居中按钮"
-  ...image url="https://www.baidu.com/img/flexible/logo/pc/result.png" width=30%
+  ...button text="Centered button"
+  ...image url="https://www.gstatic.com/images/branding/googlelogo/svg/googlelogo_clr_74x24px.svg" width=30%
 ...column-end
-- `width`: 布局组件的宽度，可选，与按钮的属性一致；若该组件是根组件，则默认值为 `100%`
+- `width`: The width of the layout component, optional, same as the button's width attribute; if this component is the root component, the default value is `100%`.
 
-> 与 Row 相同，但 Column 不支持对子组件使用 `weight` 属性
+> Same as Row, but Column does not support the `weight` attribute on child components.
 
 ---
 
-### 布局嵌套
-`Row` 与 `Column` 组件支持互相嵌套，你可以通过嵌套来实现复杂的界面布局
+### Layout Nesting
+`Row` and `Column` components support nesting within each other. You can achieve complex interface layouts through nesting.
 
-**示例：**
-...card-start title="嵌套示例"
+**Example:**
+...card-start title="Nesting Example"
     ...column-start vertical=spacedBy(8)
         ...row-start horizontal=spacedBy(8)
-            ...button text="按钮1" weight=(1)
-            ...button text="按钮2" weight=(1)
+            ...button text="Button 1" weight=(1)
+            ...button text="Button 2" weight=(1)
         ...row-end
         ...image url="https://picsum.photos/400/100" width=100% shape=8dp
     ...column-end
     ...row-start horizontal=spacedBy(8)
-        ...button text="按钮3" weight=(1)
+        ...button text="Button 3" weight=(1)
         ...column-start weight=(1)
-            ...button text="按钮4" width=100%
-            ...button text="按钮5" width=100%
+            ...button text="Button 4" width=100%
+            ...button text="Button 5" width=100%
         ...column-end
     ...row-end
 ...card-end
 
 ---
 
-### 图片组件
-虽然 Markdown 已经包括了定义图片的语法，但它可操作性太小，例如无法调整位置、宽度等  
-我们可以使用高级图片组件来解决这个痛点
+### Image Component
+Although Markdown already includes syntax for defining images, it is not very flexible (e.g., you cannot adjust position, width, etc.).
+We can use the advanced image component to solve this problem.
 
-**语法：**
+**Syntax:**
 ...image url="https://picsum.photos/400" width=40% shape=12dp
 
-**参数说明：**
-- `url`: 图片链接，必填
-- `width`: 图片的宽度，可选，与按钮宽度属性一致，
-- 示例：
+**Parameter description:**
+- `url`: Image link, required.
+- `width`: Width of the image, optional, same as the button width attribute.
+- Example:
 ...image url="https://picsum.photos/500" width=50%
 ...image url="https://picsum.photos/600" width=120dp
-- `shape`: 图片的圆角大小，与卡片的形状参数一致
-- `weight`: 权重，仅在 Row 或 Column 内部可用，且配置 `weight` 后，`width` 会被完全忽略
+- `shape`: Corner radius of the image, same as the shape parameter for cards.
+- `weight`: Weight, only available inside Row or Column. If `weight` is set, `width` will be completely ignored.
 
-> 图片属于内容组件，若未显式指定 `width` 或 `weight`，其宽度为图片原始宽度（受容器限制不会超出主页）
+> The image is a content component. If `width` or `weight` is not explicitly specified, its width is the original image width (limited by the container so it does not exceed the homepage).
 
 ---
 
-## 注意事项
-- **组件嵌套**:
-    - `Row` 与 `Column` 支持无限互相嵌套
-    - `Card` 禁止嵌套，否则内部卡片会被当作普通文本
-    - `Row`/`Column` 内部可以放置按钮、图片或嵌套的布局组件，也可以放置 Markdown 文本，不过 Markdown 文本不能像其他高级组件一样，进行缩进处理！否则会出现渲染异常
-- 标签必须成对出现，如 `...card-start` 与 `...card-end` 必须配对
-- 扩展组件不能嵌入标准 Markdown 容器：扩展组件相对独立，并没有彻底融入 Markdown 语法，例如无法将 `...image` 写在 Markdown 的代码块或表格内部
-- 图片加载依赖网络，请确保图片链接可访问
+## Important Notes
+- **Component nesting**:
+    - `Row` and `Column` support unlimited nesting within each other.
+    - `Card` cannot be nested; otherwise the inner card will be treated as plain text.
+    - Inside `Row`/`Column`, you can place buttons, images, or nested layout components. You can also place Markdown text, but Markdown text cannot be indented like other advanced components, otherwise rendering anomalies may occur!
+- Tags must appear in pairs, e.g., `...card-start` must be paired with `...card-end`.
+- Extension components cannot be embedded inside standard Markdown containers: extension components are relatively independent and not fully integrated into Markdown syntax. For example, you cannot put `...image` inside a Markdown code block or table.
+- Image loading depends on network; ensure the image link is accessible.
 
-虽然我们提供了丰富的扩展组件，但整个主页仍然基于 **Markdown**  
-如果你还不熟悉标准 Markdown 语法，建议先花几分钟学习一下，真的很好学！  
-[Markdown 菜鸟教程](https://www.runoob.com/markdown/md-tutorial.html)
+Although we provide rich extension components, the entire homepage is still based on **Markdown**.
+If you are not yet familiar with standard Markdown syntax, we recommend spending a few minutes learning it — it's really easy!
+https://www.markdownguide.org/getting-started/

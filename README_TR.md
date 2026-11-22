@@ -1,108 +1,111 @@
+> Historical upstream documentation, provided in English. File names are retained for existing links; current GDWorld build requirements are in [README.md](README.md).
+
 # Zalith Launcher 2+ (PLUS)
 
-[English](./README.md) | [中文（简体）](./README_ZH_CN.md) | [中文（台灣）](./README_ZH_TW.md) | [**「Türkçe」**](./README_TR.md)
+[Current GDWorld documentation](./README.md)
 
-> **⚠️ RESMÎ OLMAYAN DEĞİŞTİRİLMİŞ SÜRÜM**
+> **⚠️ UNOFFICIAL MODIFIED VERSION**
 >
-> Bu, [Zalith Launcher 2](https://github.com/ZalithLauncher/ZalithLauncher2)'nin resmî olmayan bir çatalıdır (fork). Bu proje **resmî Zalith Launcher projesi ile bağlantılı değildir ve onaylanmamıştır**.
+> This is an unofficial fork of [Zalith Launcher 2](https://github.com/ZalithLauncher/ZalithLauncher2). This project is **not affiliated with or endorsed by the official Zalith Launcher project**.
 
-**Zalith Launcher 2+**, [Minecraft: Java Edition](https://www.minecraft.net/) için özel olarak tasarlanmış, **Android cihazlar** için topluluk tarafından değiştirilmiş bir başlatıcıdır (launcher). [Zalith Launcher 2](https://github.com/ZalithLauncher/ZalithLauncher2) temel alınarak geliştirilmiş olup, çekirdek başlatma motoru olarak [PojavLauncher](https://github.com/PojavLauncherTeam/PojavLauncher/tree/v3_openjdk/app_pojavlauncher/src/main/jni)'ı kullanır ve **Jetpack Compose** ile **Material Design 3** kullanılarak modern bir kullanıcı arayüzüyle oluşturulmuştur.
+**Zalith Launcher 2+** is a community-modified launcher for **Android devices** tailored for [Minecraft: Java Edition](https://www.minecraft.net/). It builds upon the foundation of [Zalith Launcher 2](https://github.com/ZalithLauncher/ZalithLauncher2), utilizing [PojavLauncher](https://github.com/PojavLauncherTeam/PojavLauncher/tree/v3_openjdk/app_pojavlauncher/src/main/jni) as its core launching engine with a modern UI built using **Jetpack Compose** and **Material Design 3**.
 
-## Bazı İstatistikler
+## Some Statistics
 
-14 Temmuz 2026:
-Birleştirmeler hariç, 3 yazar ana dala 265, tüm dallara ise 266 işleme (commit) göndermiştir.
+July 14, 2026:
+Excluding merges, 3 authors have pushed 265 commits to main and 266 commits to all branches.
 
-Ana dalda 288 dosya değiştirilmiş, 10.634 satır eklenmiş ve 3.095 satır silinmiştir.
+On main, 288 files have changed and there have been 10.634 additions and 3.095 deletions
 
-## 📋 Bu Çatalda (Fork) Yeni Olanlar
+## 📋 What's New in This Fork?
 
-Bu çatal, orijinal Zalith Launcher 2 deneyimini geliştirmeyi ve özelleştirmeyi amaçlamaktadır. Başlıca iyileştirmeler şunlardır:
+This fork aims to enhance and customize the original Zalith Launcher 2 experience. Some key improvements include:
 
-- [x] Pelerin (Cape) sistemi
-- [x] Hata düzeltmeleri
-- [x] Çevrimdışı hesaplar
-- [x] Kromatik (renkli) isimler
-- [x] Ana ekranda kısayollar
-- [x] Ayarları içe/dışa aktarma
-- [x] Hesapları pelerinler, skin'ler ve kromatik isimlerle birlikte içe/dışa aktarma
-- [x] Yapılandırma ile mobileglues entegrasyonu
-- [x] Arayüz yapılandırma yenilemesi
+- [x] Cape system
+- [x] Fixes
+- [x] Offline accounts
+- [x] Chroma names
+- [x] Shortcuts in main screen
+- [x] Importing/exporting settings
+- [x] Importing/exporting accounts along with capes and skins, chroma names
+- [x] Implemented mobileglues with config
+- [x] Config UI remake
 
-Sayamayacağım kadar çok daha fazlası...
+more that i cant count...
 
-## 🔗 Upstream Proje
 
-Bu proje, Orjinal Zalith Launcher ekibinin mükemmel çalışmalarından türetilmiştir:
-- **Orijinal Proje:** [ZalithLauncher2](https://github.com/ZalithLauncher/ZalithLauncher2)
-- **Orijinal Lisans:** GPL-3.0
+## 🔗 Upstream Project
 
-Resmî, değiştirilmemiş sürümü istiyorsanız lütfen upstream projeyi ziyaret edin.
+This project is derived from the excellent work of the Zalith Launcher team:
+- **Original Project:** [ZalithLauncher2](https://github.com/ZalithLauncher/ZalithLauncher2)
+- **Original License:** GPL-3.0
 
-## 🌐 Dil ve Çeviri Desteği
+Please visit the upstream project if you want the official, unmodified version.
 
-Bu çatal, Zalith Launcher 2 çevirilerini kullanır. Çevirilere veya iyileştirmelere katkıda bulunmak için lütfen [Zalith Launcher 2 Weblate projesine](https://hosted.weblate.org/projects/zalithlauncher2) katkıda bulunmayı değerlendirin.
+## 🌐 Language and Translation Support
 
-## 📦 Derleme Talimatları (Geliştiriciler İçin)
+This fork uses translations of Zalith Launcher 2. To contribute translations or improvements, please consider contributing upstream to the [Zalith Launcher 2 Weblate project](https://hosted.weblate.org/projects/zalithlauncher2).
 
-### Gereksinimler
+## 📦 Build Instructions (For Developers)
 
-* Android Studio **Bumblebee** veya daha yenisi
+### Requirements
+
+* Android Studio **Bumblebee** or newer
 * Android SDK:
-  * **Minimum API seviyesi:** 26
-  * **Hedef API seviyesi:** 35
+  * **Minimum API level**: 26
+  * **Target API level**: 35
 * JDK 11
 
-### Derleme Adımları
+### Build Steps
 
 ```bash
 git clone https://github.com/Star1xr/ZalithLauncher2Plus.git
-# Projeyi Android Studio'da açın ve derleyin
+# Open the project in Android Studio and build
 ```
 
-## 📜 Lisans
+## 📜 License
 
-Bu proje, upstream Zalith Launcher 2 projesinden devralınan **[GPL-3.0 lisansı](LICENSE)** altında lisanslanmıştır.
+This project is licensed under the **[GPL-3.0 license](LICENSE)**, inherited from the upstream Zalith Launcher 2 project.
 
-### Önemli Hükümler
+### Important Terms
 
-**Katkılar ve Atıf**
-   - Tüm değişiklikler açıkça belgelenmiş ve bu çatala atfedilmiştir
-   - Upstream projeye uygun şekilde atıfta bulunulmuştur
+**Contributions and Attribution**
+   - All modifications are clearly documented and attributed to this fork
+   - The upstream project is properly credited
 
-## 📦 Açık Kaynak Kütüphaneler ve Lisanslar
+## 📦 Open Source Libraries and Licenses
 
-Bu proje, Zalith Launcher 2'den tüm bağımlılıkları devralmıştır. Açık kaynak kütüphanelerin ve lisanslarının tam listesi için lütfen orijinal projenin [README](https://github.com/ZalithLauncher/ZalithLauncher2/blob/main/README.md) dosyasına bakın.
+This project inherits all dependencies from Zalith Launcher 2. Please refer to the original project's [README](https://github.com/ZalithLauncher/ZalithLauncher2/blob/main/README.md) for the complete list of open source libraries and their licenses.
 
-## 🤝 Katkıda Bulunma
+## 🤝 Contributing
 
-Bu bir topluluk çatalıdır. Katkıda bulunmadan önce:
+This is a community fork. Before contributing:
 
-1. [CONTRIBUTING.md](./CONTRIBUTING.md) yönergelerini inceleyin
-2. Mevcut hata raporlarını ve çekme isteklerini (pull request) kontrol edin
-3. Kod stilini ve kurallarını takip edin
-4. Değişikliklerinizi açıkça belgelendirin
+1. Review the [CONTRIBUTING.md](./CONTRIBUTING.md) guidelines
+2. Check existing issues and pull requests
+3. Follow the code style and conventions
+4. Document your changes clearly
 
-## ⚠️ Destek ve Sorumluluk Reddi
+## ⚠️ Support and Disclaimers
 
-- Bu **resmî olmayan bir çataldır**. Resmî destek için [yukarı akış Zalith Launcher 2 projesine](https://github.com/ZalithLauncher/ZalithLauncher2) başvurulmalıdır
-- Hataları lütfen bu deponun hata takipçisine bildirin
-- Yukarı akışla ilgili sorunlar için öncelikle orijinal projeye bildirmeyi değerlendirin
-- Kullanım riski size aittir. Bu çatal resmî bir garanti veya destek sunmaz
+- This is an **unofficial fork**. Official support should be sought from the [upstream Zalith Launcher 2 project](https://github.com/ZalithLauncher/ZalithLauncher2)
+- Please report bugs to this repository's issue tracker
+- For upstream-related issues, consider reporting to the original project first
+- Use at your own risk. This fork comes with no official warranty or support
 
-## 🔒 Güvenlik ve Gizlilik
+## 🔒 Security and Privacy
 
-- Her zaman bu resmî depodan indirin
-- Bu yazılımı dağıttığını iddia eden üçüncü taraf web sitelerine karşı dikkatli olun
-- Kişisel bilgilerinizi ve kimlik bilgilerinizi koruyun
-- Güvenlik sorunlarını hata takipçisi aracılığıyla sorumlu bir şekilde bildirin
+- Always download from this official repository
+- Be cautious of third-party websites claiming to distribute this software
+- Protect your personal information and credentials
+- Report security issues responsibly through the issue tracker
 
-## 📞 İletişim ve Bağlantılar
+## 📞 Contact & Links
 
-- **Orijinal Proje:** https://github.com/ZalithLauncher/ZalithLauncher2
-- **Bu Çatal:** https://github.com/Star1xr/ZalithLauncher2Plus
+- **Original Project:** https://github.com/ZalithLauncher/ZalithLauncher2
+- **This Fork:** https://github.com/Star1xr/ZalithLauncher2Plus
 
 ---
 
-**Zalith Launcher 2**, Zalith Launcher ekibi tarafından oluşturulan ve sürdürülen orijinal projedir.  
-**Zalith Launcher 2+**, gelişmiş özellikler ve değişiklikler sağlamak amacıyla oluşturulmuş resmî olmayan bir topluluk çatalıdır.
+**Zalith Launcher 2** is the original project created and maintained by the Zalith Launcher team.
+**Zalith Launcher 2+** is an unofficial community fork created to provide enhanced features and modifications.
