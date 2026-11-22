@@ -1,77 +1,77 @@
 # GDWorld Android
 
-[Скачать APK 0.1.6 — ARM64](https://github.com/Kyv-Corp/GD-World-Android-Launcher/releases/download/v000007/GDWorld-Android.apk) · [Релиз и SHA-256](https://github.com/Kyv-Corp/GD-World-Android-Launcher/releases/tag/v000007) · [Исходники](https://github.com/Kyv-Corp/GD-World-Android-Launcher)
+[Download APK 0.1.6 — ARM64](https://github.com/Kyv-Corp/GD-World-Android-Launcher/releases/download/v000007/GDWorld-Android.apk) · [Release and SHA-256](https://github.com/Kyv-Corp/GD-World-Android-Launcher/releases/tag/v000007) · [Source code](https://github.com/Kyv-Corp/GD-World-Android-Launcher) · [Desktop launcher](https://github.com/Kyv-Corp/GDWorld-Launcher)
 
-Android-клиент GDWorld на базе [ZalithLauncher2Plus](https://github.com/Star1xr/ZalithLauncher2Plus), точная версия указана в `UPSTREAM.json`. Изменения GDWorld и оригинальная база распространяются под GPLv3; оригинальные авторские уведомления сохранены.
+GDWorld's Android client is based on [ZalithLauncher2Plus](https://github.com/Star1xr/ZalithLauncher2Plus). The exact upstream revision is recorded in `UPSTREAM.json`. GDWorld changes and the original base are distributed under GPLv3; upstream copyright notices are retained.
 
-Главный экран: вход GDWorld, автоматическое получение сборки `GDWorldTest`, запуск с подключением к серверу, кабинет на сайте. Полный интерфейс Zalith доступен через «Расширенные возможности». MobileGlues выбран по умолчанию. Состав модов и версии Minecraft/NeoForge читаются из профиля сервера: отдельных правил для модов нет. Рендереры, Java и LWJGL устанавливает Android-база, настольные библиотеки не копируются.
+The home screen provides GDWorld sign-in, automatic preparation of the `GDWorldTest` pack, launch with a server connection, and access to the website account panel. The full Zalith interface is available through **Advanced features**. MobileGlues is the default renderer. Minecraft, NeoForge and mod versions come from the server profile; there are no special rules for individual mods. The Android base supplies renderers, Java and LWJGL; desktop native libraries are not copied.
 
-## Изменения 0.1.6
+## Current status
 
-Владелец подтвердил открытие системного окна отправки после обновления. В меню ⋮ у обычных файлов встроенного файлового менеджера добавлена команда «Поделиться»: стандартное окно Android получает выбранный файл через существующий FileProvider с разрешением на чтение. Название команды переведено на пять языков. Для папок отправка не предлагается.
+**0.1.6 is a preview release, not a confirmed fix for native game crashes.** Two users report that 0.1.4 ran for over 30 minutes, while identical native JVM crashes started after updating to 0.1.5. The investigation is paused at the owner's request. The 0.1.4 → 0.1.5 source diff changes only the account layout and app version; all 59 native libraries and 67 non-profile assets in the released APKs are byte-identical. This does not rule out an update regression. See [VALIDATION.md](VALIDATION.md) for evidence and limits.
 
-Файловый менеджер уже открывается в .minecraft: предыдущий журнал указывал путь к отчёту JVM `versions → GDWorld-1.21.1-21.1.267 → hs_err_pid*.log`. Альтернативный путь через системное окно выбора документов: `GDWorld → android_data → files → .minecraft → versions`. С 0.1.6 для будущих нативных отчётов задаётся каталог `files/logs/native/hs_err_pid%p.log` (PID подставляет JVM); явный пользовательский `-XX:ErrorFile` сохраняется. В системном окне этот каталог доступен как `GDWorld → android_data → files → logs → native`. Получатель выбирается пользователем. Полный отчёт JVM с пострадавшего OnePlus получен: подтверждено падение Service Thread при очистке SymbolTable; исправление ещё не подтверждено. Разбор и временная диагностическая проверка описаны в [VALIDATION.md](VALIDATION.md). Релиз 0.1.6 опубликован; установите поверх 0.1.5. Скачивание требует доступа к приватному репозиторию.
+Version 0.1.6 / `v000007` / versionCode 7 was published on 22 November 2026. It uses the original GDWorld signing identity; its exact APK SHA-256 was registered in Gravit before publication. Assets: `GDWorld-Android.apk` and `SHA256SUMS`. Both launcher repositories are now public.
 
-## Исправление 0.1.5
+## Changes in 0.1.6
 
-В 0.1.4 обнаружено падение раздела аккаунтов: FlowRow запрашивает внутренние размеры у LazyColumn/BoxWithConstraints. В 0.1.5 эта компоновка заменена обычными Column/Row с явными границами панелей. Успешный вход, файловый менеджер и диалог авторства 0.1.4 уже проверены на Poco; в 0.1.5 открытие аккаунтов без падения подтверждено владельцем и ADB-снимком на Poco X3 Pro. Панели и кнопки читаемы.
+The built-in file manager adds **⋮ → Share** for ordinary files, using Android's system chooser and the existing FileProvider with a read grant. The user selects the recipient. Folder sharing is not offered. The label is translated into five UI languages; no new dependencies or permissions were added. The owner confirmed that the chooser opens after updating.
 
-## Изменения 0.1.4
+The manager already opens inside `.minecraft`. Older JVM reports were expected under `versions → GDWorld-1.21.1-21.1.267 → hs_err_pid*.log`. The system document picker exposes that path as `GDWorld → android_data → files → .minecraft → versions`.
 
-Файловый менеджер на узком экране использует полноширинный список и боковую панель поверх содержимого; команды переносятся на новые строки. Управление аккаунтами располагается вертикально, действия карточки вынесены под имя. Диалог «О лаунчере» стал компактным с корректным авторством MovTery/Star1xr. Размеры файлов форматируются без необработанных шаблонов. В авторство GDWorld добавлены Best_Jaro и Endayt на всех пяти языках.
+Starting with 0.1.6, future native reports default to `files/logs/native/hs_err_pid%p.log`; the JVM substitutes the PID, and an explicit user `-XX:ErrorFile` is preserved. In the system picker, use `GDWorld → android_data → files → logs → native`. A real report from the affected OnePlus confirmed that saving works. It shows a Service Thread crash while cleaning SymbolTable; the root cause and a fix remain unconfirmed. Install over 0.1.5 to retain application data.
 
-GDWorld-мост возвращает отсутствие сертификата чата (204) вместо фиктивной подписи authlib-injector. Серверные настройки проверки ключей не менялись. OAuth восстанавливается штатным запросом Gravit restore; refresh выполняется только при истечении токена. Серверный модуль должен быть обновлён перед APK: регистрация разрешённой сборки задаёт тип CLIENT, как у настольного лаунчера, не авторизуя игрока. Неизвестные APK и неверные токены по-прежнему запрещены. Релиз 0.1.4 опубликован; установите поверх 0.1.3 и полностью перезапустите игру.
+## Account-screen fix in 0.1.5
 
-## Изменения 0.1.3
+The new 0.1.4 FlowRow requested intrinsic measurements from LazyColumn/BoxWithConstraints and crashed when opening accounts. Version 0.1.5 replaces it with bounded Column/Row panels. The owner and an ADB screenshot confirmed readable panels and buttons without that UI crash on Poco X3 Pro. Sign-in, the file manager and credits had already been checked in 0.1.4. These checks did not establish long-session game stability.
 
-Расширенное меню учитывает вырез камеры и системные отступы. На узких экранах шапка занимает две строки, а боковые панели заменены вертикальным списком полноширинных карточек с прокруткой. Постоянная стрелка возвращает из расширенного меню в GDWorld; во вложенных разделах работает обычный возврат. Панель действий не перекрывает навигацию.
+## Changes in 0.1.4
 
-Исходная проблема воспроизведена через ADB на Poco X3 Pro (392 dp, Android 12, верхний вырез 91 px). После ручного обновления до 0.1.3 проверены снимки новой компоновки на Poco; владелец подтвердил возврат в GDWorld и прокрутку нижних карточек. Установка по USB не выполнялась. Релиз 0.1.3 опубликован; устанавливается поверх 0.1.2 с сохранением подписи.
+On narrow screens, the file manager uses a full-width list, an overlay sidebar and wrapping commands. Account management stacks vertically and places card actions below the name. The About dialog is compact, correctly credits MovTery/Star1xr, and includes Best_Jaro and Endayt in all five languages. File sizes no longer show raw format placeholders or duplicate values.
 
-## Изменения 0.1.2
+The GDWorld bridge returns no chat certificate (HTTP204), replacing authlib-injector's dummy signature. Server key-validation settings are unchanged. OAuth uses Gravit restore; refresh runs only after token expiry. Before distributing the APK, update the server module: registration of an approved build sets CLIENT type as on desktop, without authenticating a player. Unknown APKs and invalid tokens remain rejected. Install over 0.1.3 and fully restart the game.
 
-Исправлено зависание на первом процессоре NeoForge: код завершения JVM отправляется до завершения Android-процесса, приёмник открывается до запуска сервиса, старый результат не переносится между запусками. Java установщика выбирается по метаданным Minecraft (Java 21 для 1.21.1). Во время выполнения непрозрачного JVM-процессора показываются его имя, номер шага и версия Java; процент увеличивается после завершения и проверки результата.
+## Changes in 0.1.3
 
-Горизонтальный главный экран использует две колонки с отдельной прокруткой: запуск/управление слева, вход или состояние установки справа. Поворот не пересоздаёт операцию подготовки сборки. Физический телефон пока не проверен. Релиз 0.1.2 опубликован; устанавливается поверх 0.1.1 с сохранением подписи.
+Advanced features respect camera cutouts and system insets. Narrow screens use a two-row header and a scrolling list of full-width cards instead of side panels. A persistent back arrow returns from the advanced home to GDWorld; nested screens use normal back navigation. Actions no longer cover navigation.
 
-## Изменения 0.1.1
+The original issue was reproduced through ADB on Poco X3 Pro: 392dp window, Android12, 91px top cutout. After a manual update, upper/lower layout captures were checked; the owner confirmed back navigation and scrolling. No USB installation was performed. Install over 0.1.2 with the same signing identity.
 
-Прогресс подготовки показывает текущую операцию установщика Minecraft/NeoForge, проверку файлов и фактически скачанные байты модпака. Процент относится к подписанному этапу, а при неизвестном объёме показывается неопределённый индикатор. Проверка SHA-1 выполняется во время скачивания; установка файлов начинается после проверки всех загрузок. После передачи запуска штатному загрузчику его задачи остаются видны на главном экране. Отмена удерживает задачу занятой до завершения очистки.
+## Changes in 0.1.2
 
-Главный экран адаптирован к узким экранам: компактная шапка, форма шириной до 480 dp, прокрутка, отступы под вырезы и клавиатуру, перенос вспомогательных кнопок. Новые подписи переведены на все пять языков. Проверка обновлений использует актуальный репозиторий и учитывает prerelease с готовым `GDWorld-Android.apk`.
+Fixed the first NeoForge processor hanging: the JVM result is sent before the child Android process exits, the receiver binds before service launch, and results cannot leak between runs. Installer Java follows Minecraft metadata: Java21 for 1.21.1. Opaque JVM steps show the processor name, step and Java version; progress advances after completion and output verification.
 
-Изменения включены в опубликованный тестовый релиз 0.1.1. Подпись сохранена: APK можно установить поверх 0.1.0.
+The landscape home uses independently scrolling launch/actions and sign-in/progress columns. Rotation does not recreate pack preparation. Physical landscape validation was still pending at that release. Install over 0.1.1.
 
-## Сборка
+## Changes in 0.1.1
 
-NDK требует путь к исходникам без пробелов. Нужны JDK 21+, Android SDK Platform 37.0, Build Tools 37.0.0 и NDK 25.2.9519653. Укажите `sdk.dir` в локальном `local.properties` либо `ANDROID_HOME`.
+Preparation reports the current Minecraft/NeoForge installer task, file checking and actual downloaded pack bytes. Percentages apply to the named phase; unknown totals use an indeterminate indicator. SHA-1 is checked during download, and installation starts only after all downloads are verified. Native launch tasks remain visible after handoff. Cancellation keeps the operation busy until cleanup completes.
+
+The portrait home has a compact header, a form capped at480dp, scrolling, cutout/keyboard insets and wrapping secondary buttons. New strings support all five languages. Update checking uses the current repository and includes published prereleases with a nonempty `GDWorld-Android.apk`. Version0.1.1 retains the0.1.0 signing identity for in-place updates.
+
+## Building
+
+The NDK requires a source path without spaces. Install JDK21+, Android SDK Platform37.0, Build Tools37.0.0 and NDK25.2.9519653. Set `sdk.dir` in a local `local.properties` or use `ANDROID_HOME`.
 
 ```sh
 ./gradlew :ZalithLauncher:testDebugUnitTest :ZalithLauncher:assembleDebug -Darch=arm64
 ```
 
-Release требует собственную подпись через переменные `GDWORLD_KEYSTORE` (абсолютный путь), `STORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`. Исходные публичные ключи Zalith не используются. APK находится в `ZalithLauncher/build/outputs/apk/`.
+Release signing uses your own `GDWORLD_KEYSTORE` (absolute path), `STORE_PASSWORD`, `KEY_ALIAS` and `KEY_PASSWORD` environment variables. The public Zalith signing keys are not used. APKs are written under `ZalithLauncher/build/outputs/apk/`.
 
-## Подключение к Gravit
+## Gravit integration
 
-Gravit проверяет разрешённую Android-сборку перед обычной CLIENT-авторизацией. Серверная часть находится в `server/`; она не заменяет проверку пароля, 2FA, UUID, токена, whitelist и серверного входа. Сборки разрешаются по SHA-256 APK; это механизм регистрации версии клиента, а не аппаратная аттестация устройства.
+Gravit checks an approved Android build before normal CLIENT authentication. The module in `server/` does not replace password, 2FA, UUID, token, whitelist or server-join checks. APK SHA-256 approval registers a client build; it is not hardware device attestation.
 
-Соберите модуль против библиотек действующего Gravit 5.7.14:
+Build against the running Gravit5.7.14 distribution libraries:
 
 ```sh
 GRAVIT_CLASSPATH='/path/to/distribution/lib/*' bash server/build.sh
 ```
 
-Установите JAR в каталог модулей LaunchServer и добавьте `GDWorldAndroid_module` в `loadModules` рабочего `modules.json`. Создайте `config/GDWorldAndroid/sha256.txt` в рабочем каталоге LaunchServer. Каждая строка — разрешённый SHA-256 APK в нижнем регистре. Перезапустите только Gravit после подключения модуля. Изменение списка хешей перезапуска не требует. Не отключайте штатную защиту Gravit ради Android.
+Install the JAR in LaunchServer's modules directory, add `GDWorldAndroid_module` to `loadModules` in the active `modules.json`, and create `config/GDWorldAndroid/sha256.txt` under the LaunchServer working directory. Each line is an approved lowercase APK SHA-256. Restart only Gravit when installing the module; hash-list changes need no restart. Keep normal Gravit protections enabled.
 
-GitHub Actions собирает тестовые APK. Используйте теги с шестизначным кодом сборки: `v000001` для `launcher_version_code=1`; так штатная проверка обновлений сопоставляет код APK с тегом. Релиз по тегу `v*` использует секреты `GDWORLD_KEYSTORE_BASE64`, `STORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`. До установки нового APK добавьте его хеш на сервер. Сохраняйте предыдущие разрешённые версии, пока они нужны игрокам.
+GitHub Actions builds test APKs. Six-digit tags match version codes: `v000001` corresponds to `launcher_version_code=1`. Tagged `v*` releases use `GDWORLD_KEYSTORE_BASE64`, `STORE_PASSWORD`, `KEY_ALIAS` and `KEY_PASSWORD` Actions secrets. Register the new APK hash before distribution, retaining previous versions while players need them.
 
-## Состояние
+The full CI JVM/ARM64 Debug run and local signed Release build passed. APKv2, the certificate match to0.1.0, architecture and uploaded hashes were verified. The0.1.1 tag workflow built and signed successfully but encountered an existing release during publication; the workflow now preserves previously verified assets. A successful build does not establish GPU compatibility or long-session stability. Detailed historical results are in [VALIDATION.md](VALIDATION.md).
 
-Текущий тестовый релиз **0.1.6**, тег `v000007`, versionCode 7, опубликован 22 ноября 2026. APK подписан прежним ключом GDWorld; точный SHA-256 зарегистрирован в рабочем Gravit до публикации. Состав релиза: `GDWorld-Android.apk` и `SHA256SUMS`.
-
-Релиз собран локально. Полный GitHub CI-прогон тестов и ARM64 Debug-сборки прошёл; локальная Release-сборка, APK v2, совпадение сертификата с 0.1.0, архитектура и контрольные суммы загрузки проверены. Этот APK подписан локально. Теговый CI 0.1.1 подтвердил автоматическую сборку и подпись, но публикация тогда завершилась ошибкой уже существующего релиза; workflow теперь сохраняет такой проверенный APK без перезаписи. Подробности — в [VALIDATION.md](VALIDATION.md). Работа модпака на конкретном GPU подтверждается запуском на устройстве; физический игровой запуск этого релиза ещё не проверен.
-
-Название, логотип и иллюстрации GDWorld принадлежат их владельцам; лицензия исходников не передаёт права на товарные обозначения и чужие изображения.
-
-В репозиторий не входят приватная инфраструктура проекта, данные игроков, аккаунты, серверные ключи и ключ подписи приложения.
+GDWorld names, logos and artwork belong to their respective owners. The source license grants no trademark or third-party artwork rights. Private infrastructure, player data, accounts, server keys and the application signing key are excluded from this repository.

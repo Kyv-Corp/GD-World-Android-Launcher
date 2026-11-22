@@ -1,33 +1,33 @@
-# Plus 1.3 (Pelerinler, Babric, Ekran Kaydedici ve daha fazlası)
+# Plus 1.3 (Capes, Babric, Screen Recorder & more)
 
-### Pelerinler
-- minecraftcapes.net galeri API'si ile yeni pelerin koleksiyon sistemi
-- Düzenleme (kalem simgesi), favori, silme, "Pelerin Yok" seçeneği ile pelerin seçici diyalogu
-- Resmi galeriden indirme ile pelerin galerisi
-- Kırpılmış pelerin arka küçük resimleri (bilinear filtreleme)
-- Pelerin seçici diyaloguna "Galeriden Pelerin Yükle" butonu eklendi
-- Buton isimleri: "Pelerin Seç" → "Pelerinler", "Galeriden Pelerin Yükle"
-- Pelerin değişiklikleri için gardırop önizleme düzeltmeleri
-- ely.by hesapları için istemci taraflı pelerin desteği
+### Capes
+- New cape collection system with minecraftcapes.net gallery API
+- Cape selector dialog with rename (edit icon), favorite, delete, "No Cape" option
+- Cape gallery with download from official gallery
+- Cropped cape back thumbnails (bilinear filtering)
+- Upload cape from gallery button inside CapeSelectorDialog
+- Button renames: "Select Cape" → "Capes", "Upload Cape from Gallery"
+- Wardrobe preview fixes for cape changes
+- Client-side ely.by cape support
 
-### Babric Mod Yükleyici
-- b1.7.3 için tam Babric mod yükleyici desteği
+### Babric Mod Loader
+- Full Babric mod loader support for b1.7.3
 
-### Ekran Kaydedici
-- Süre sayacı ile yerleşik oyun ekran kaydedicisi
-- Ses desteği (PLAYBACK_CAPTURE), video-only'ya düşüş
+### Screen Recorder
+- Built-in game screen recorder with elapsed timer
+- Audio support (PLAYBACK_CAPTURE), fallback to video-only
 
-### Düzeltmeler
-- Boş cihazda OpenAL çökme düzeltmesi (`ALSOFT_DISABLE_EVENTS`)
-- Yinelenen libopenal.so uyarısı çözüldü
-- Galeri pelerin küçük resim yüklemesi ana iş parçacığından taşındı
+### Fixes
+- OpenAL crash fix on null device (`ALSOFT_DISABLE_EVENTS`)
+- Duplicate libopenal.so warning resolved
+- Gallery cape thumbnail loading moved off main thread
 
-### Diğer
-- Yeniden deneme + geri çekilme ile oyuncu bildirimi yoklaması
-- GameVersionFilter'da Kararlı/Snapshot sekme hapı
-- SearchAssetsScreen iyileştirmeleri
-- OSMesa gecelik yapıya güncellendi
-- Varsayılan geçiş animasyonu SLICE_IN olarak değiştirildi
-- CI action-gh-release v3'e yükseltildi
-- Çeviriler: zh-cn, vi-vn, tr güncellemeleri
-- Pull request şablonu eklendi
+### Other
+- Player notice polling with retry + backoff
+- Stable/Snapshots tab pill in GameVersionFilter
+- SearchAssetsScreen improvements
+- OSMesa updated to nightly build
+- Default transition animation changed to SLICE_IN
+- CI upgraded to action-gh-release v3
+- Translations: zh-cn, vi-vn, tr updates
+- Pull request template added

@@ -4,7 +4,7 @@
 
 # MobileGlues
 
-**Language**: **English** | [简体中文](README_CN.md) | [繁體中文](README_CHT.md) | [日本語](README_JP.md)
+**Language**: **English** | [Simplified Chinese](README_CN.md) | [Traditional Chinese](README_CHT.md) | [Japanese](README_JP.md)
 
 <a href="https://www.buymeacoffee.com/Swung0x48" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
